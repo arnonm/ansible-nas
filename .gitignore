@@ -3,7 +3,6 @@ site
 .vagrant
 *.retry
 *.log
-inventories
 .cache
 roles/bertvv.samba
 roles/geerlingguy.docker

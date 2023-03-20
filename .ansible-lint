@@ -8,6 +8,8 @@ exclude_paths:
  - roles/bertvv.samba
  - roles/geerlingguy.docker
  - roles/geerlingguy.nfs
+ - roles/ansible-role-mergerfs
+ - roles/ansible-role-snapraid
 
 mock_modules:
  - docker_container
