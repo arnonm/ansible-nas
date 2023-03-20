@@ -10,15 +10,35 @@
         - ansible-nas-users
         - ansible-nas
 
-    - role: bertvv.samba
+    - role: ansible-disk
+      tags:
+        - ansible-nas
+        - ansible-disk
+
+    - role: ansible-role-mergerfs
+      tags:
+        - mergerfs
+        - skip_ansible_lint
+      when: (mergerfs_enabled | default(False))
+
+    - role: ansible-role-snapraid
+      tags:
+        - snapraid
+        - skip_ansible_lint
+      when: (snapraid_enabled | default(False))
+
+    #  - role: bertvv.samba
+     - role: vladgh.samba.server
       tags:
         - samba
         - skip_ansible_lint
+      when: (samba_enabled | default(False))
 
     - role: geerlingguy.nfs
       tags:
         - nfs
         - skip_ansible_lint
+      when: (nfs_enabled | default(False))
 
     - role: geerlingguy.docker
       tags:
@@ -160,6 +180,7 @@
     - role: hello_world
       tags:
         - hello_world
+      when: (hello_world_enabled | default(False))
 
     - role: homeassistant
       tags:
@@ -309,6 +330,11 @@
       tags:
         - plex
       when: (plex_enabled | default(False))
+
+    - role: photoprism
+      tags:
+        - photoprism
+      when: (photoprism_enabled | default(False))
 
     - role: portainer
       tags:
