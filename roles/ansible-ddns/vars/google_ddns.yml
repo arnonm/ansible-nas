@@ -1,0 +1,14 @@
+---
+
+ddns_packages:
+  - ddclient
+
+ddns_config_files:
+  - name: ddclient config
+    src: ddclient.conf.j2
+    dest: /etc/ddclient.conf
+    owner: "{{ ddclient_user }}"
+    group: "{{ ddclient_user }}"
+    mode: "0600"
+
+ddns_service: ddclient
