@@ -1,0 +1,51 @@
+---
+- name: gather os specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+      skip: true
+  tags:
+    - vars
+    - install
+
+- name: Install DDNS
+  block:
+    - name: include ddns client variables
+      include_vars: "{{ ddns_client }}.yml"
+      tags:
+        - install
+        - config
+        - start-service
+
+    - name: install ddns packages
+      package:
+        name: "{{ item }}"
+        state: present
+        use: "{{ package_override | default(omit) }}"
+      retries: 5
+      with_items:
+        - "{{ ddns_packages }}"
+      tags:
+        - install
+
+    - name: template configuration files
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner | default('root') }}"
+        group: "{{ item.group | default('root') }}"
+        mode: "{{ item.mode | default('0644') }}"
+      with_items:
+        - "{{ ddns_config_files }}"
+      notify: restart ddns service
+      tags:
+        - config
+
+    - name: flush handlers
+      meta: flush_handlers
+      tags:
+        - start-service
+  with: dns_client_enabled is true
