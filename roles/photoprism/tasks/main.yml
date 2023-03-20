@@ -1,0 +1,26 @@
+---
+- name: Start photoprism
+  block:
+    - name: Create prism Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        # mode: 0755
+      with_items:
+        - "{{ photoprism_config_directory }}"
+        - "{{ photoprism_logs }}"
+        - "{{ photoprism_storage }}"
+
+    - name: Include install tasks
+      import_tasks: install_container.yml
+      tags:
+        - photoprism
+  when: photoprism_enabled is true
+
+- name: Stop Photoprism
+  block:
+    - name: Stop Photoprism
+      docker_container:
+        name: "{{ photoprism_container_name }}"
+        state: absent
+  when: photoprism_enabled is false
