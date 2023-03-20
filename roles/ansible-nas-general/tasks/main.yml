@@ -45,3 +45,19 @@
     mode: "u=rwX,g=rwX,o=rX"
     recurse: false
   loop: "{{ samba_shares }}"
+
+- name: "Add FQDN to /etc/hosts"
+  lineinfile:
+    dest: "/etc/hosts"
+    regexp: '^127\.0\.1\.1'
+    line: "127.0.1.1 {{ ansible_nas_fqdn }} {{ ansible_nas_hostname }}"
+    state: present
+
+- name: Remove old packages from the cache
+  apt:
+    autoclean: yes
+
+- name: Remove dependencies that are no longer needed
+  apt:
+    autoremove: yes
+    purge: yes
