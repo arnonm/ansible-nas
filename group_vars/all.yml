@@ -187,6 +187,7 @@ samba_shares:
 # https://help.ubuntu.com/community/SettingUpNFSHowTo#Shares
 # WARNING: Weird things might happen if you share the same data over Samba and NFS and allow writes on both!
 
+nfs_enabled: false
 nfs_shares_root: /mnt/Volume3
 
 nfs_exports:
@@ -195,6 +196,7 @@ nfs_exports:
 ###
 ### Samba
 ###
+samba_enabled: false
 # Seems to break browsing of the \\server-name shares root when enabled
 samba_mitigate_cve_2017_7494: false
 
