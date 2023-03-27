@@ -1,0 +1,69 @@
+---
+- name: Start homer
+  block:
+    - name: Create homer group
+      group:
+        name: homer
+        gid: "{{ homer_group_id }}"
+        state: present
+
+    - name: Create homer user
+      user:
+        name: homer
+        uid: "{{ homer_user_id }}"
+        state: present
+        system: yes
+        update_password: on_create
+        create_home: no
+        group: homer
+
+    - name: Create homer Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        # mode: 0755
+      with_items:
+        - "{{ homer_assets_directory }}"
+        - "{{ homer_compose_directory }}"
+
+    - name: Template over docker-compose.yml file
+      template:
+        src: templates/docker-compose.yml
+        dest: "{{homer_compose_directory}}/docker-compose.yml"
+        owner: homer
+        group: homer
+
+    # - name: Stop existing plex
+    #   docker_compose:
+    #     build: no
+    #     stopped: yes
+    #     project_src: "{{ homer_compose_directory }}"
+    # - assert:
+    #     that:
+    #       - "not homer.state.running"
+
+    - name: Build homer
+      docker_compose:
+        state: present
+        build: yes
+        project_src: "{{ homer_compose_directory }}"
+
+    - name: Start homer
+      docker_compose:
+        build: no
+        project_src: "{{ homer_compose_directory }}"
+  when: homer_enabled is true
+
+- name: Stop homer
+  block:
+    - name: Stop homer
+      docker_compose:
+        name: "{{ homer_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check homer is stopped
+      assert:
+        that:
+          - not result.changed
+  when: homer_enabled is false

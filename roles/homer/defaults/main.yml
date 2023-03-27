@@ -1,0 +1,9 @@
+---
+homer_enabled: false
+homer_container_name: homer
+homer_user_id: "1311"
+homer_group_id: "1311"
+homer_init_assets: 1
+homer_port: 8082
+homer_assets_directory: "{{samba_shares_root}}/homer"
+homer_compose_directory: "{{samba_shares_root}}/homer"
