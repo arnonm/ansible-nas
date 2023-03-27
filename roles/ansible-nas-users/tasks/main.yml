@@ -14,37 +14,41 @@
     group: ansible-nas
     shell: /usr/sbin/nologin
 
-- name: "Create/update primary user with sudo privileges"
-  user:
-    name: "{{ user }}"
-    password: "{{ user_passwd | password_hash('sha512') }}"
-    state: present
-    groups: sudo
-    append: true
-    shell: /bin/bash
-
-- name: Ensure authorized keys for remote user is installed
-  authorized_key:
-    user: "{{ user }}"
-    state: present
-    key: "{{ ssh_pub_key }}"
-
 - name: Ensure authorized key for root user is installed
   authorized_key:
     user: root
     state: present
     key: "{{ ssh_pub_key }}"
+  when: ssh_pub_key | d(False)
+
+- name: "Create/update primary user with sudo privileges"
+  user:
+    name: "{{ primary_user }}"
+    password: "{{ primary_user_passwd | password_hash('sha512') }}"
+    state: present
+    groups: "sudo, users"
+    append: true
+    shell: /bin/bash
+
+- name: "Ensure authorized keys for remote user is installed"
+  authorized_key:
+    user: "{{ primary_user }}"
+    state: present
+    key: "{{ ssh_pub_key }}"
+  when: ssh_pub_key | d(False) and primary_user | d(False)
 
 - name: Update root user password.
   user:
     name: root
     password: "{{ root_passwd | password_hash('sha512') }}"
 
-- name: Add regular user_passwd
-  ansible.builtin.user:
-    name: { { item.name } }
-    comment: { { item.comment } }
-    groups: users, {{ item.groups }}
-    state: absent
-    password: { { item.password  | password_hash('sha512') } }
-  loop: { { regular_users } }
+- name: Create/Update regular user_passwd
+  user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment }}"
+    groups: users
+    state: present
+    password: "{{ item.password  | password_hash('sha512') }}"
+    append: true
+    shell: /bin/bash
+  loop: "{{ regular_users }}"
