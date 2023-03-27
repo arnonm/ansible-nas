@@ -1,0 +1,51 @@
+---
+- name: Get Webmin script
+  shell: "curl -o /tmp/setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh"
+  no_log: true
+  when: webmin_enabled
+
+- name: Install pexpect
+  apt:
+    name: "python3-pexpect"
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: Run Webmin script
+  expect:
+    command: "sh /tmp/setup-repos.sh"
+    responses:
+      "Setup Webmin official repository.*": "y"
+  no_log: true
+
+- name: webmin | Install xvfb package (CentOS and RedHat)
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }} update_cache=yes"
+  become: true
+  tags: package
+  with_items:
+    - webmin
+  changed_when: false
+
+- name: webmin | Install webmin package (Freebsd)
+  pkgng: name={{ item }} state={{ util_pkg_state|default('present') }}
+  become: true
+  when: (ansible_distribution == 'FreeBSD')
+  tags: package
+  with_items:
+    - webmin
+  changed_when: false
+
+- name: webmin | Install Webmin
+  pkgutil: name={{ item }} state=present
+  when: ((ansible_distribution == 'Solaris') and (ansible_distribution_version not in ['11.1']))
+  with_items:
+    - SUNWwebminr
+#- name: Copy Dockerfile
+#  template: src=Dockerfile.j2 dest={{ docker_files_generated_directory }}/Dockerfile mode=0777
+#  when: docker_files_enable
+#
+#- name: Copy build.sh
+#  template: src=build.sh.j2 dest={{ docker_files_generated_directory }}/build.sh mode=0777
+#  when: docker_files_enable
+- name: Remove temporary files
+  shell: "rm /tmp/setup-repos.sh"
