@@ -1,0 +1,98 @@
+[
+  {
+    "title": "Portainer",
+    "colour": "#161b1f",
+    "url": "http://192.168.1.117:9000",
+    "description": "{\"enabled\":\"1\",\"dataonly\":\"1\",\"override_url\":null,\"username\":\"hda_admin\",\"password\":\"Mashov123456\",\"ignore_tls\":\"0\"}",
+    "appid": "07b796b3a10eaa8b6f485ed2379187a39400b459",
+    "appdescription": "Portainer is a simple management solution for Docker. Easily manage your Docker hosts and Docker Swarm clusters via Portainer web user interface."
+  },
+  {
+    "title": "Plex",
+    "colour": "#161b1f",
+    "url": "http://192.168.1.112:32400",
+    "description": "{\"enabled\":\"0\",\"dataonly\":\"1\",\"override_url\":null,\"token\":null,\"ignore_tls\":\"0\"}",
+    "appid": "aebda823a279b219476c565be863d83739999502",
+    "appdescription": "Plex media server allows you to aggregate all your personal media and access it anywhere you go. Enjoy your own content on all your devices with Plex."
+  },
+  {
+    "title": "PhotoPrism",
+    "colour": "#fafbfc",
+    "url": "http://192.168.117:9000",
+    "description": "{\"enabled\":\"0\",\"override_url\":null}",
+    "appid": "f60f5b25d59c397989e3cd374f81cdd7710a4fca",
+    "appdescription": "PhotoPrism is a server-based application for browsing, organizing and sharing your personal photo collection. It makes use of the latest technologies to automatically tag and find pictures without getting in your way. Say goodbye to solutions that force you to upload your visual memories to the cloud."
+  },
+  {
+    "title": "Bazarr",
+    "colour": "#161b1f",
+    "url": "ddd",
+    "description": "{\"enabled\":\"1\",\"override_url\":null,\"apikey\":\"apikey\"}",
+    "appid": "085f0b437f9bf9c98bb68b745c8dcf323a7e0499",
+    "appdescription": "Bazarr is a companion application to Sonarr and Radarr. It manage and download subtitles based on your requirements. You defined your preferences by TV show or movies and Bazarr take care of everything for you."
+  },
+  {
+    "title": "Cockpit",
+    "colour": "#161b1f",
+    "url": "url",
+    "description": null,
+    "appid": "e4475bc2121ed1ffd1e742c7c2521ca0f16cef93",
+    "appdescription": "Cockpit is an interactive server admin interface. It is easy to use and very lightweight. Cockpit interacts directly with the operating system from a real Linux session in a browser."
+  },
+  {
+    "title": "Deluge",
+    "colour": "#161b1f",
+    "url": "url",
+    "description": "{\"enabled\":\"0\",\"override_url\":null,\"password\":\"password\"}",
+    "appid": "bc28bfa49a73fd2384cbecd6572ea72d0166aa28",
+    "appdescription": "Deluge is a BitTorrent client written in Python. Deluge is cross-platform, using a front and back end architecture where libtorrent, a software library written in C++ which provides the application's networking logic, is connected to one of various front ends through the project's own Python bindings"
+  },
+  {
+    "title": "Jackett",
+    "colour": "#fafbfc",
+    "url": "url",
+    "description": null,
+    "appid": "9d24b65315557ddd848ba44b09191a6ab305966f",
+    "appdescription": "Jackett works as a proxy server: it translates queries from apps (Sonarr, Radarr, SickRage, CouchPotato, Mylar, DuckieTV, etc) into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software."
+  },
+  {
+    "title": "Jellyfin",
+    "colour": "#161b1f",
+    "url": "url",
+    "description": "{\"enabled\":\"0\",\"override_url\":null,\"password\":\"password\",\"availablestats\":[\"MovieCount\"]}",
+    "appid": "3e0a7f109bd760b9474c78cb652e8c3e82669226",
+    "appdescription": "Jellyfin is the Free Software Media System that puts you in control of managing and streaming your media. There are no strings attached, no premium licenses or features, and no hidden agendas."
+  },
+  {
+    "title": "ownCloud",
+    "colour": "#161b1f",
+    "url": "URL",
+    "description": null,
+    "appid": "668b5fcda851fe516fef14e82973beffe32f385a",
+    "appdescription": "ownCloud is a free and open source file hosting service. It also supports extensions for online document editing, calendar and contact synchronization. It's a safe home for all your data."
+  },
+  {
+    "title": "phpMyAdmin",
+    "colour": "#fafbfc",
+    "url": "URL",
+    "description": null,
+    "appid": "51ca673ea8e89a868706fd309777a101ac63a409",
+    "appdescription": "phpMyAdmin is a free software tool written in PHP, intended to handle the administration of MySQL over the Web. phpMyAdmin supports a wide range of operations on MySQL and MariaDB. Frequently used operations (managing databases, tables, columns, relations, indexes, users, permissions, etc) can be performed via the user interface, while you still have the ability to directly execute any SQL statement."
+  },
+  {
+    "title": "Sonarr",
+    "colour": "#161b1f",
+    "url": "URL",
+    "description": "{\"enabled\":\"0\",\"override_url\":null,\"apikey\":\"APIKEY\"}",
+    "appid": "6e2a525ceb737f9ed8badcef5eb20d1502e39656",
+    "appdescription": "Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available."
+  },
+  {
+    "title": "Webmin",
+    "colour": "#161b1f",
+    "url": "URL",
+    "description": null,
+    "appid": "b9726e44ef09db12f6e010af8977d55dc971b841",
+    "appdescription": "Webmin is a web-based system configuration tool for Unix-like systems, although recent versions can also be installed and run on Windows."
+  }
+]
