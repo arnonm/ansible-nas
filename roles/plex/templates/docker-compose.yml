@@ -1,0 +1,18 @@
+version: "2.2"
+services:
+  plex:
+    image: plexinc/pms-docker
+    container_name: {{plex_container_name}}
+    network_mode: host
+    environment:
+      - TZ="{{ansible_nas_timezone}}"
+      - PUID={{plex_user_id}}
+      - PGID={{plex_group_id}}
+      - VERSION={{ plex_version }}
+        #- PLEX_CLAIM = "claim-M8MmfkAsxcQCxZbSgq_C"
+    volumes:
+      - "{{plex_config_directory }}:/config"
+      - "{{plex_tmp_directory }}:/transcode"
+      - "{{plex_data_directory}}:/data"
+    restart: unless-stopped
+    

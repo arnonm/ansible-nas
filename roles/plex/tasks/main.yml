@@ -1,40 +1,69 @@
 ---
-- name: Create Plex Directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    # mode: 0755
-  with_items:
-    - "{{ plex_config_directory }}"
-    - "{{ plex_logs }}"
+- name: Install Plex
+  block:
+    - name: Create Plex group
+      group:
+        name: plex
+        gid: "{{ plex_group_id }}"
+        state: present
 
-- name: Create Plex Docker Container
-  docker_container:
-    name: plex
-    image: linuxserver/plex
-    pull: true
-    volumes:
-      - "{{ plex_config_directory }}:/config:rw"
-      - "{{ plex_logs }}:/opt/plex/Library/Application Support/Plex Media Server/Logs:rw"
-      - "{{ plex_movies_directory }}:/movies:{{ plex_movies_permissions }}"
-      - "{{ plex_tv_directory }}:/tv:{{ plex_tv_permissions }}"
-      - "{{ plex_photos_directory }}:/photos:{{ plex_photos_permissions }}"
-      - "{{ plex_podcasts_directory }}:/podcasts:{{ plex_podcasts_permissions }}"
-      - "{{ plex_music_directory }}:/music:{{ plex_music_permissions }}"
-      - "{{ plex_audiobooks_directory }}:/audiobooks:{{ plex_audiobooks_permissions }}"
-    network_mode: "host"
-    devices: "{{ plex_devices | default(omit) }}"
-    env:
-      TZ: "{{ ansible_nas_timezone }}"
-      PUID: "{{ plex_user_id }}"
-      PGID: "{{ plex_group_id }}"
-      VERSION: "{{ plex_version }}"
-    restart_policy: unless-stopped
-    memory: "{{ plex_memory }}"
-    labels:
-      traefik.enable: "{{ plex_available_externally | string }}"
-      traefik.http.routers.plex.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.plex.tls.certresolver: "letsencrypt"
-      traefik.http.routers.plex.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.plex.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.services.plex.loadbalancer.server.port: "32400"
+    - name: Create Plex user
+      user:
+        name: plex
+        uid: "{{ plex_user_id }}"
+        state: present
+        system: yes
+        update_password: on_create
+        create_home: no
+        group: plex
+
+    - name: Create Plex Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        # mode: 0755
+      with_items:
+        - "{{ plex_config_directory }}"
+        - "{{ plex_logs }}"
+
+    - name: Template over docker-compose.yml file
+      template:
+        src: "templates/docker-compose.yml"
+        dest: "{{plex_compose_directory}}/docker-compose.yml"
+        owner: plex
+        group: plex
+
+    - name: Stop existing plex
+      docker_compose:
+        build: no
+        stopped: yes
+        project_src: "{{ plex_compose_directory }}"
+    # - assert:
+    #     that:
+    #       - "not plex.state.running"
+
+    - name: Build plex
+      docker_compose:
+        state: present
+        build: yes
+        project_src: "{{ plex_compose_directory }}"
+
+    - name: Start Plex
+      docker_compose:
+        build: no
+        project_src: "{{ plex_compose_directory }}"
+  when: plex_enabled is true
+
+- name: Stop Plex
+  block:
+    - name: Stop Plex
+      docker_container:
+        name: "{{ plex_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Plex is stopped
+      assert:
+        that:
+          - not result.changed
+  when: plex_enabled  is false
