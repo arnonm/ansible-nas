@@ -38,6 +38,11 @@
     content: "{{ docker_daemon_json | to_nice_json }}"
   register: docker_config
 
+- name: Install docker-compose
+  ansible.builtin.pip:
+    name: docker-compose
+  become: yes
+
 - name: Restart Docker # noqa no-handler
   service:
     name: docker
