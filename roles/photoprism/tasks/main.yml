@@ -1,26 +1,69 @@
 ---
-- name: Start photoprism
-  block:
-    - name: Create prism Directories
-      file:
-        path: "{{ item }}"
-        state: directory
-        # mode: 0755
-      with_items:
-        - "{{ photoprism_config_directory }}"
-        - "{{ photoprism_logs }}"
-        - "{{ photoprism_storage }}"
+  - name: Start photoprism
+    block:
+      - name: Create Prism group
+        group:
+          name: prism
+          gid: "{{ photoprism_group_id }}"
+          state: present
 
-    - name: Include install tasks
-      import_tasks: install_container.yml
-      tags:
-        - photoprism
-  when: photoprism_enabled is true
+      - name: Create Prism user
+        user:
+          name: prism
+          uid: "{{ photoprism_user_id }}"
+          state: present
+          system: yes
+          update_password: on_create
+          create_home: no
+          group: prism
 
-- name: Stop Photoprism
-  block:
-    - name: Stop Photoprism
-      docker_container:
-        name: "{{ photoprism_container_name }}"
-        state: absent
-  when: photoprism_enabled is false
+      - name: Create prism Directories
+        file:
+          path: "{{ item }}"
+          state: directory
+          owner: "{{photoprism_user_id}}"
+          group: "{{photoprism_group_id}}"
+          # mode: 0755
+        with_items:
+          - "{{ photoprism_config_directory }}"
+          - "{{ photoprism_compose_directory }}"
+          - "{{ photoprism_storage }}"
+          
+      - name: Template over docker-compose.yml file
+        template:
+          src: templates/docker-compose.yml
+          dest: "{{photoprism_compose_directory}}/docker-compose.yml"
+          owner: prism
+          group: prism
+
+      # - name: Stop existing photoprism
+      #   docker_compose:
+      #     build: no
+      #     stopped: yes
+      #     project_src: "{{photoprism_compose_directory}}"
+ 
+      - name: Build Photoprism
+        docker_compose:
+          state: present
+          build: yes
+          project_src: "{{ photoprism_compose_directory }}"
+
+      - name: Start Photoprism
+        docker_compose:
+          build: no
+          project_src: "{{ photoprism_compose_directory }}"
+    when: photoprism_enabled is true
+
+  - name: Stop Photoprism
+    block:
+      - name: Stop Photoprism
+        docker_container:
+          name: "{{ photoprism_container_name }}"
+          state: absent
+        register: result
+
+      - name: Check Photoprism is stopped
+        assert:
+          that:
+            - not result.changed
+    when: photoprism_enabled is false

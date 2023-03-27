@@ -5,11 +5,12 @@ photoprism_available_externally: false
 # directories
 photoprism_config_directory: "{{ docker_home }}/prism/config"
 photoprism_storage: "{{ docker_home }}/prism/storage"
-photoprism_photos_directory: "{{ photos_root }}"
+photoprism_photos_directory: "{{ samba_shares_root }}/photos"
+photoprism_compose_directory: "{{ docker_home }}/prism/config"
 
 # uid / gid
-photoprism_user_id: "0"
-photoprism_group_id: "0"
+photoprism_user_id: "1308"
+photoprism_group_id: "1308"
 
 # If you're paranoid, set permissions to "ro" so Prism won't ever be able to
 # delete your files
