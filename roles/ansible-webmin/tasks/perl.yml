@@ -1,0 +1,123 @@
+---
+- name: webmin | Install webmin dependencies
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{  util_pkg_state|default('present') }}"
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  with_items:
+   - perl
+   - libnet-ssleay-perl
+   - openssl
+   - libauthen-pam-perl
+   - libpam-runtime
+   - libio-pty-perl
+   - apt-show-versions
+
+- name: webmin | Install webmin mysql dependencies
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{  util_pkg_state|default('present') }}"
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  with_items:
+   - libdbd-mysql-perl
+   - libdbi-perl
+
+- name: webmin | Install perl for running
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }} update_cache=yes"
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or (ansible_distribution == 'RedHat' and not ansible_distribution_major_version == '6'))
+  tags: package
+  with_items:
+   - perl-Env
+  become: true
+
+- name: webmin | Install cpanminus (RedHat based)
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }} update_cache=yes"
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or (ansible_distribution == 'RedHat' and not ansible_distribution_major_version == '6'))
+  tags: package
+  with_items:
+   - perl-App-cpanminus
+  become: true
+
+- name: webmin | Install CPAN tools needed by cpp generator (RedHat based)
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  become: true
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat')
+  with_items:
+   - perl-CPAN
+
+# export PERL_MM_USE_DEFAULT=1
+# export PERL_EXTUTILS_AUTOINSTALL="--defaultdeps"
+# sudo PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'install Test::More'
+
+# It makes perl automatically answer "yes" when CPAN asks "Would you like to configure as much as possible automatically? [yes]"
+- name: webmin | Install automatically perl module PERL_MM_USE_DEFAULT
+  shell: "echo $PERL_MM_USE_DEFAULT"
+  environment:
+   PERL_MM_USE_DEFAULT: 1
+
+- name: webmin | Echo PERL_MM_USE_DEFAULT again
+  shell: "echo $PERL_MM_USE_DEFAULT"
+
+# TODO below is hanging the first time it is run
+# Manually install CPAN if so
+
+# WARNING firs time it might ask for Please enter the URL of your CPAN mirror
+# perl -MCPAN -eshell
+# Enter http://www.cpan.org
+# o conf commit
+# commit: wrote '/usr/share/perl5/CPAN/Config.pm'
+
+# TODO on Ubuntu configure cpan by hand
+# sudo perl -MCPAN -e 'install Bundle::CPAN'
+
+- name: webmin | Check perl
+  shell: perl -e 'use FileHandle; print $FileHandle::VERSION'
+  changed_when: false
+  become: true
+
+# pkg install p5\-DBI
+- name: webmin | Install perl modules needed by mysql webmin (Freebsd)
+  pkgng: name={{ item }} state={{ util_pkg_state|default('present') }}
+  become: true
+  when: (ansible_distribution == 'FreeBSD')
+  tags: package
+  with_items:
+   - p5-DBI
+   - p5-DBD-mysql
+  changed_when: false
+
+# Below is same has above but with CPAN
+- name: webmin | Install cpan perl modules needed by mysql webmin
+  shell: "cpan {{ item }}"
+  with_items:
+   - DBI
+   - DBD::mysql
+  register: cpan_result
+  changed_when: false
+  become: true
+
+- name: webmin | Install ssl for Net::SSLeay
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  become: true
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'RedHat')
+  with_items:
+   - openssl-devel
+
+- name: webmin | Install ssl for Net::SSLeay
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }}"
+  become: true
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  with_items:
+   - libssl-dev
+
+- name: webmin | Install cpan perl additional modules webmin
+  shell: "cpan {{ item }}"
+  with_items:
+   - DDigest::MD5
+   - Net::SSLeay
+  register: cpan_result
+  changed_when: false
+  become: true
+
+# TODO test
+# perl -e 'use Net::SSLeay'
+
+- name: webmin | Run perl cpan check
+  shell: perl -MLWP::Simple -e 1
+  when: cpan_result.changed

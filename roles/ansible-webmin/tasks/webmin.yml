@@ -1,0 +1,74 @@
+---
+- include: perl.yml
+
+- include: dependencies.yml
+
+- name: webmin | Addkey webmin
+  apt_key: url=http://www.webmin.com/jcameron-key.asc state=present
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  become: true
+
+- name: webmin | Add webmin repo
+
+  action: apt_repository repo="deb https://download.webmin.com/download/repository sarge contrib" state=present update_cache=yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+# and ansible_distribution_version in ['12.04', '13.04', '14.04', '16.04']
+  become: true
+
+# - name: webmin | Add webmin repo
+#   apt_repository: repo='deb https://download.webmin.com/download/repository {{ansible_lsb.codename}} contrib' state=present update_cache=yes
+#   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and ansible_distribution_version not in ['12.04', '13.04', '14.04', '16.04']
+#   become: true
+
+- name: webmin | Install webmin
+  action: "{{ ansible_pkg_mgr}} name={{ item }} state={{  util_pkg_state|default('present') }} update_cache=yes"
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+  with_items:
+   - webmin
+  become: true
+
+- name: webmin | Add Optional channel (RedHat)
+  shell: echo "[Webmin] name=Webmin Distribution Neutral baseurl=http://download.webmin.com/download/yum enabled=1 gpgcheck=1 gpgkey=http://www.webmin.com/jcameron-key.asc" >/etc/yum.repos.d/webmin.repo;
+  become: true
+  when: (ansible_distribution == 'RedHat' and ansible_distribution_major_version == '7')
+  changed_when: false
+
+- name: webmin | Install xvfb package (CentOS and RedHat)
+  action: "{{ ansible_pkg_mgr }} name={{ item }} state={{ util_pkg_state|default('present') }} update_cache=yes"
+  become: true
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux')
+  tags: package
+  with_items:
+   - webmin
+  changed_when: false
+
+- name: webmin | Install webmin package (Freebsd)
+  pkgng: name={{ item }} state={{ util_pkg_state|default('present') }}
+  become: true
+  when: (ansible_distribution == 'FreeBSD')
+  tags: package
+  with_items:
+   - webmin
+  changed_when: false
+
+- name: webmin | Install Webmin
+  pkgutil: name={{ item }} state=present
+  when: ((ansible_distribution == 'Solaris') and (ansible_distribution_version not in ['11.1']))
+  with_items:
+   - SUNWwebminr
+
+# - name: webmin | Setup webmin
+#   command: /usr/sfw/lib/webmin/setup.sh
+#   when: ((ansible_distribution == 'Solaris') and (ansible_distribution_version not in ['11.1']))
+#   become: true
+
+# - name: webmin | Enable webmin
+#   command: /usr/sbin/svcadm enable webmin
+#   when: ((ansible_distribution == 'Solaris') and (ansible_distribution_version not in ['11.1']))
+#   become: true
+
+- name: Remove duplicate entry.
+  file: name=/etc/apt/sources.list.d/{{ item }} state=absent
+  become: true
+  when: ( ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' )
+  with_items: webmin_repo_files
