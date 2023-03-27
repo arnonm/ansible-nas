@@ -1,0 +1,7 @@
+client_version: "2.1.9"
+# download_url: "https://www.noip.com/client/linux/noip-duc-linux.tar.gz"
+download_url: "https://dmej8g5cpdyqd.cloudfront.net/downloads/noip-duc_3.0.0-beta.6.tar.gz"
+deb_package: "noip-duc_3.0.0-beta.6/binaries/noip-duc_3.0.0-beta.6_amd64.deb"
+client_dir: "no-ip-2.1.9"
+service_name: "noip2.service"
+ddns_boot_at_start: false
