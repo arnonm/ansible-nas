@@ -1,0 +1,231 @@
+---
+##                       ._____.   .__
+##  _____    ____   _____|__\_ |__ |  |   ____             ____ _____    ______
+##  \__  \  /    \ /  ___/  || __ \|  | _/ __ \   ______  /    \\__  \  /  ___/
+##   / __ \|   |  \\___ \|  || \_\ \  |_\  ___/  /_____/ |   |  \/ __ \_\___ \
+##  (____  /___|  /____  >__||___  /____/\___  >         |___|  (____  /____  >
+##       \/     \/     \/        \/          \/               \/     \/     \/
+##     a n s i b l e - n a s      https://github.com/davestephens/ansible-nas
+
+# Add your all.yml config overrides to this file. See group_vars/all.yml for all possible settings.
+
+# Ansible options
+ansible_nas_hostname: hda
+ansible_nas_fqdn: dsm.xxx.xxx
+ansible_nas_timezone: Asia/Jerusalem
+ansible_nas_user: hda_admin
+ansible_nas_email: arnon.meshoulam@gmail.com
+
+primary_user: "hda_admin"
+ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5MmEhwd7q59uGEyeX2VajxXdU/MXPmYD5on7Gfn+WIFREnYbnstQKxrpyk78UikW1V9diNU0qBIGbnpXyzlCGMz3tMH4+SNxSbBmKCVR4itMscyoMBIhOUjyl/OF7idYrNQa95BV/MArh/n6XN1wpJywqTTR++Clhex4o32DeqTUDpNQhTkpmjJTFLi7JK13NcSCUO2ceFNsP6FiKlgrlliTErEf6qdCi/HqBmQgXBn75YvVG7771bElzGlI/XkyCmSOo/bDU+4y6M9D5HecK64YNHG1g8ipZaPekbUZqUo5LjNlhPIsIZqTHz8J0Ld0vE2MO4ByH5TSkUreRgS0T creating SSH"
+primary_user_passwd: "Mashov123"
+root_passwd: "Mashov123"
+
+regular_users:
+  - name: ava
+    comment: "Ava Diamond"
+    password: "P@ssw0rd"
+    email: "avadiamond@gmail.com"
+  - name: yael
+    comment: "Yael Meshoulam"
+    password: "P@ssw0rd"
+    email: "yael.meshoulam@gmail.com"
+  - name: arnon
+    comment: "Arnon Meshoulam"
+    password: "P@ssw0rd"
+    email: "arnon.meshoulam@gmail.com"
+
+samba_enabled: true
+samba_shares_root: /mnt/Pool1/samba # We don't want it in Mount - we want it in the pools
+samba_server_string: "DSM NAS"
+samba_users:
+  - name: arnon
+    password: "P@ssw0rd"
+  - name: ava
+    password: "P@ssw0rd"
+  - name: yael
+    password: "P@ssw0rd"
+
+# Shares you want published over Samba.
+samba_shares:
+  - name: downloads
+    comment: "Stuff downloaded"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ downloads_root }}"
+
+  - name: movies
+    comment: "Movies"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ movies_root }}"
+
+  - name: tv
+    comment: "TV Episodes"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ tv_root }}"
+
+  - name: music
+    comment: "Music"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ music_root }}"
+
+  - name: dump
+    comment: "File dump"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ samba_shares_root }}/dump"
+
+  - name: photos
+    comment: "Pictures"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ photos_root }}"
+
+  - name: documents
+    comment: "Documents"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ documents_root }}"
+
+  - name: code
+    comment: "Code"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ code_root }}"
+
+nfs_shares_root:
+nfs_exports:
+
+cockpit_enabled: true
+cockpit_started: true
+cockpit_port: 9090
+cockpit_packages: full
+
+mergerfs_enabled: false
+mergerfs_install_mode: package_manager
+
+mergerfs_mounts:
+  - path: /mnt/storage
+    branches:
+      - /mnt/data*
+      - /mnt/other
+    options: allow_other,use_ino
+    mergerfs_mounts: []
+
+docker_users:
+  - arnon
+
+# Area for all the configuration files of the applicaiton in containers
+docker_home: /mnt/Volume2/docker
+# Area of all the containers themselves
+docker_image_directory: "{{ docker_home }}/data"
+
+## Enable some applications
+traefik_enabled: true
+
+portainer_enabled: true
+portainer_data_directory: "{{ docker_home }}/portainer/config"
+
+photoprism_enabled: true
+photoprism_available_externally: true
+photoprism_compose_directory: "{{ docker_home }}/prism/config"
+photoprism_storage: "{{ docker_home }}/prism/storage"
+photoprism_photos_directory: "{{ photos_root }}"
+photoprism_config_directory: "{{ docker_home }}/prism/config"
+
+heimdall_enabled: false
+heimdall_port_http: 8081
+heimdall_data_directory: "{{ docker_home }}/heimdall" # Needs to be changed
+
+homer_enabled: false
+homer_port: "8082"
+homer_compose_directory: "{{samba_shares_root}}/homer"
+
+bazarr_enabled: true
+radarr_enabled: true
+deluge_enabled: true
+jackett_enabled: true
+sonarr_enabled: true
+
+plex_enabled: true
+#plex_devices:
+#  - "/dev/dri:/dev/dri"
+
+snapraid_install: true
+snapraid_runner: false
+snapraid_runner_email_address:
+snapraid_runner_email_pass: ""
+snapraid_content_files:
+  - /var/snapraid.content
+snapraid_data_disks:
+  - path: /mnt/disk1
+    content: true
+  - path: /mnt/disk2
+    content: true
+  - path: /mnt/disk3
+  - path: /mnt/disk4
+
+snapraid_parity_disks:
+  - path: /mnt/parity1
+    content: true
+
+additional_fs_utils:
+  - xfsprogs # package for mkfs.xfs on RedHat / Ubuntu
+  - btrfs-progs # package for mkfs.btrfs on CentOS / Debian
+
+disk_additional_disks:
+  - disk: /dev/sdb
+    fstype: ext4
+    mount_options: defaults
+    mount: /mnt/2isk1
+    #  user: www-data
+    #  group: www-data
+    #  mode: "0755"
+    #  disable_periodic_fsck: false
+  - disk: /dev/sdc
+    #  part: /dev/nvme0n1p1
+    fstype: ext4
+    mount_options: defaults
+    mount: /mnt/disk2
+disk_enable_partioning: false
+
+ansible_ddns_enabled: true
+ddns_client: "duc"
+ddns_packages: []
+ddclient_user: root
+ddns_config_files: []
+ddns_service: ""
+ddns_boot_at_start: false
+ddns_username: "arnon.meshoulam@gmail.com"
+ddns_password: "Mashov123"
+
+# Gmail Credentials
+google_domain_protocol: "googledomains"
+google_domain_login: "testuser"
+google_domain_password: "testpassword"
+google_domain_ddns: "ddns-domain.test"
+
+timemachine_enabled: true
+timemachine_data_directory: "{{samba_shares_root}}/timemachine"
+
+webmin_enabled: false
+webmin_base_dir: "/usr/share/webmin"
