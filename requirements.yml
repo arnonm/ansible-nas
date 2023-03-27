@@ -2,10 +2,13 @@
 - name: geerlingguy.docker
   version: 6.0.0
 
-- name: vladgh.samba
-  version: v3.0.3
-# - name: bertvv.samba
-# version: v2.7.1
+  # name: vladgh.samba.server
+  # version: v3.0.3
+- name: bertvv.samba
+  version: v2.7.1
 
 - name: geerlingguy.nfs
   version: 2.0.0
+
+- name: linux-system-roles.cockpit
+  version: 1.4.3
