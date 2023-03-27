@@ -27,8 +27,12 @@
         - skip_ansible_lint
       when: (snapraid_enabled | default(False))
 
-    #  - role: bertvv.samba
-     - role: vladgh.samba.server
+    - role: ansible-ddns
+      tags:
+        - ansible-ddns
+      when: (ansible_ddns_enabled | default(False))
+
+    - role: bertvv.samba
       tags:
         - samba
         - skip_ansible_lint
@@ -45,6 +49,11 @@
         - docker
         - skip_ansible_lint
 
+    - role: ansible-nas-docker
+      tags:
+        - ansible-nas-docker
+        - ansible-nas
+
     ###
     ### Ansible-NAS Roles
     ###
@@ -53,10 +62,7 @@
         - ansible-nas-general
         - ansible-nas
 
-    - role: ansible-nas-docker
-      tags:
-        - ansible-nas-docker
-        - ansible-nas
+    
 
     ###
     ### Applications
@@ -64,6 +70,11 @@
     - role: airsonic
       tags:
         - airsonic
+
+    - role: ansible-webmin
+      tags:
+        - webmin
+      when: (webmin_enabled | default(False))
 
     - role: bazarr
       tags:
@@ -92,6 +103,11 @@
     - role: code-server
       tags:
         - code-server
+
+    - role: linux-system-roles.cockpit
+      tags: 
+        - cockpit
+      when: (cockpit_enabled | default(False))
 
     - role: couchpotato
       tags:
@@ -181,6 +197,11 @@
       tags:
         - hello_world
       when: (hello_world_enabled | default(False))
+
+    - role: homer
+      tags:
+        - homer
+      when: (homer_enabled | default(False))
 
     - role: homeassistant
       tags:
