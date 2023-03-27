@@ -194,6 +194,11 @@ nfs_exports:
   - "{{ nfs_shares_root }}/public *(rw,sync,no_root_squash)"
 
 ###
+### Cockpit
+###
+cockpit_enabled: false
+
+###
 ### Samba
 ###
 samba_enabled: false
