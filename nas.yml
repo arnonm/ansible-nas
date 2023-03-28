@@ -21,6 +21,11 @@
         - skip_ansible_lint
       when: (mergerfs_enabled | default(False))
 
+    - role: ansible-letsencrypt
+      tags:
+        - ansible-letsencrypt
+      when (letsencrypt_enabled | default(False))
+      
     - role: ansible-role-snapraid
       tags:
         - snapraid
