@@ -15,6 +15,10 @@
         - ansible-nas
         - ansible-disk
 
+    - role: aisbergg.lm_sensors
+      tags:
+        - ansible-sensors
+
     - role: ansible-role-mergerfs
       tags:
         - mergerfs
@@ -24,8 +28,8 @@
     - role: ansible-letsencrypt
       tags:
         - ansible-letsencrypt
-      when (letsencrypt_enabled | default(False))
-      
+      when: (letsencrypt_enabled | default(False))
+
     - role: ansible-role-snapraid
       tags:
         - snapraid
@@ -66,8 +70,6 @@
       tags:
         - ansible-nas-general
         - ansible-nas
-
-    
 
     ###
     ### Applications
@@ -110,7 +112,7 @@
         - code-server
 
     - role: linux-system-roles.cockpit
-      tags: 
+      tags:
         - cockpit
       when: (cockpit_enabled | default(False))
 

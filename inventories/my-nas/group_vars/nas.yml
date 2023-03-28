@@ -11,10 +11,11 @@
 
 # Ansible options
 ansible_nas_hostname: hda
-ansible_nas_fqdn: dsm.xxx.xxx
+ansible_nas_fqdn: dsm.dsmhome.com
 ansible_nas_timezone: Asia/Jerusalem
 ansible_nas_user: hda_admin
 ansible_nas_email: arnon.meshoulam@gmail.com
+ansible_nas_domain: "dsmhome.com"
 
 primary_user: "hda_admin"
 ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5MmEhwd7q59uGEyeX2VajxXdU/MXPmYD5on7Gfn+WIFREnYbnstQKxrpyk78UikW1V9diNU0qBIGbnpXyzlCGMz3tMH4+SNxSbBmKCVR4itMscyoMBIhOUjyl/OF7idYrNQa95BV/MArh/n6XN1wpJywqTTR++Clhex4o32DeqTUDpNQhTkpmjJTFLi7JK13NcSCUO2ceFNsP6FiKlgrlliTErEf6qdCi/HqBmQgXBn75YvVG7771bElzGlI/XkyCmSOo/bDU+4y6M9D5HecK64YNHG1g8ipZaPekbUZqUo5LjNlhPIsIZqTHz8J0Ld0vE2MO4ByH5TSkUreRgS0T creating SSH"
@@ -170,10 +171,16 @@ plex_enabled: true
 #plex_devices:
 #  - "/dev/dri:/dev/dri"
 
+route53_ddns_enabled: false
+route53_key_id: "AKIAWTIF3ARN47QD5MQU"
+route53_secret_key: "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"
+route53_hosted_zone_id: "Z02933762Z5QX7AU5NGZQ"
+route53_host: "{{ansible_nas_hostname}}.{{ ansible_nas_domain }}"
+
 snapraid_install: true
 snapraid_runner: false
-snapraid_runner_email_address:
-snapraid_runner_email_pass: ""
+snapraid_runner_email_address: "arnon.meshoulam@gmail.com"
+snapraid_runner_email_pass: "Tivon!23"
 snapraid_content_files:
   - /var/snapraid.content
 snapraid_data_disks:
