@@ -1,0 +1,8 @@
+---
+- name: install via certbox
+  include_tasks: install-certbox.yml
+  when: letsencrypt_install == 'certbot'
+
+- name: install via ansible
+  include_tasks: install-ansbile.yml
+  when: letsencrypt_install == ansible'
