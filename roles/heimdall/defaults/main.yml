@@ -20,4 +20,4 @@ heimdall_memory: 1g
 
 heimdall_container_name: heimdall
 
-heimdall_pre_install_apps: false
+heimdall_pre_install_apps: true
