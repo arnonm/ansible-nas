@@ -11,4 +11,4 @@ if [ -f ~/.ssh/id_ras.pub ]; then
     exiting
 fi
 
-scp ~/.ssh/id_ras.pub arnon@${IPADDRESS}:/home/arnon/.ssh/
+scp ~/.ssh/id_rsa.pub hda_admin@${IPADDRESS}:/home/hda_admin/.ssh/authorized_keys

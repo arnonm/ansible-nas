@@ -47,9 +47,15 @@ echo VBoxManage createhd --filename "${VMDIR}/${MACHINENAME}_DISK2.vdi" --size 8
 VBoxManage createhd --filename "${VMDIR}/${MACHINENAME}/${MACHINENAME}_DISK2.vdi" --size 80000 --format VDI
 VBoxManage storageattach $MACHINENAME --storagectl "SATA Controller" --port 1 --device 0 --type hdd --medium  "${VMDIR}/${MACHINENAME}/${MACHINENAME}_DISK2.vdi"
 
-echo VBoxManage createhd --filename "${VMDIR}/${MACHINENAME}_DISK3.vdi" --size 80000 --format VDI
-VBoxManage createhd --filename "${VMDIR}/${MACHINENAME}/${MACHINENAME}_DISK3.vdi" --size 80000 --format VDI
+echo VBoxManage createhd --filename "${VMDIR}/${MACHINENAME}_DISK3.vdi" --size 40000 --format VDI
+VBoxManage createhd --filename "${VMDIR}/${MACHINENAME}/${MACHINENAME}_DISK3.vdi" --size 40000 --format VDI
 VBoxManage storageattach $MACHINENAME --storagectl "SATA Controller" --port 2 --device 0 --type hdd --medium  "${VMDIR}/${MACHINENAME}/${MACHINENAME}_DISK3.vdi"
+
+
+echo VBoxManage createhd --filename "${VMDIR}/${MACHINENAME}_DISK4.vdi" --size 40000 --format VDI
+VBoxManage createhd --filename "${VMDIR}/${MACHINENAME}/${MACHINENAME}_DISK4.vdi" --size 40000 --format VDI
+VBoxManage storageattach $MACHINENAME --storagectl "SATA Controller" --port 2 --device 0 --type hdd --medium  "${VMDIR}/${MACHINENAME}/${MACHINENAME}_DISK4.vdi"
+
 
 
 VBoxManage storagectl $MACHINENAME --name "IDE Controller" --add ide --controller PIIX4
