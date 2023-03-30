@@ -12,3 +12,6 @@
 
 - name: linux-system-roles.cockpit
   version: 1.4.3
+
+- name: aisbergg.lm_sensors
+  version: v2.1.0
