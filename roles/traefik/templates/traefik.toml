@@ -37,10 +37,11 @@
 
 [certificatesResolvers]
   [certificatesResolvers.letsencrypt]
-    [certificatesResolvers.letsencrypt.acme]
+    [certificatesResolvers.letsencrypt.{{certResolverName}}]
       email = "{{ ansible_nas_email }}"
       storage = "/letsencrypt/acme.json"
-      caserver = "{{ traefik_acme_server }}"
-
-      [certificatesResolvers.letsencrypt.acme.dnsChallenge]
-        provider = "{{ traefik_dns_provider }}"
+      # caserver = "{{ traefik_acme_server }}"
+      [certificatesResolvers.myresolver.{{certResolverName}}.tlsChallenge]
+          entryPoint = "web"  
+      # [certificatesResolvers.letsencrypt.acme.dnsChallenge]
+        # provider = "{{ traefik_dns_provider }}"

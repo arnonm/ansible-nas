@@ -1,0 +1,19 @@
+{
+    "{{certResolverName}}": {
+        "Account": {
+            "Email": "{{cert_email}}",
+            "Registration": {
+                "body": {
+                    "status": "valid",
+                    "contact": [
+                        "<mailto:{{cert_email}}>"
+                    ]
+                },
+                "uri": "{{traefik_acme_server}}"
+            },
+            "PrivateKey": "redacted",
+            "KeyType": "4096"
+        },
+        "Certificates": []
+    }
+}
