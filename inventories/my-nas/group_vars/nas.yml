@@ -21,33 +21,42 @@ ansible_nas_fqdn: "{{ansible_nas_hostname}}.{{ansible_nas_domain}}"
 
 primary_user: "hda_admin"
 ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5MmEhwd7q59uGEyeX2VajxXdU/MXPmYD5on7Gfn+WIFREnYbnstQKxrpyk78UikW1V9diNU0qBIGbnpXyzlCGMz3tMH4+SNxSbBmKCVR4itMscyoMBIhOUjyl/OF7idYrNQa95BV/MArh/n6XN1wpJywqTTR++Clhex4o32DeqTUDpNQhTkpmjJTFLi7JK13NcSCUO2ceFNsP6FiKlgrlliTErEf6qdCi/HqBmQgXBn75YvVG7771bElzGlI/XkyCmSOo/bDU+4y6M9D5HecK64YNHG1g8ipZaPekbUZqUo5LjNlhPIsIZqTHz8J0Ld0vE2MO4ByH5TSkUreRgS0T creating SSH"
-primary_user_passwd: "Mashov123"
-root_passwd: "Mashov123"
 
 regular_users:
   - name: ava
     comment: "Ava Diamond"
-    password: "P@ssw0rd"
+    password: "{{ default_user_password}}"
     email: "avadiamond@gmail.com"
   - name: yael
     comment: "Yael Meshoulam"
-    password: "P@ssw0rd"
+    password: "{{ default_user_password}}"
     email: "yael.meshoulam@gmail.com"
   - name: arnon
     comment: "Arnon Meshoulam"
-    password: "P@ssw0rd"
+    password: "{{ default_user_password}}"
     email: "arnon.meshoulam@gmail.com"
+  - name: racheli
+    comment: "Rachel Schechter"
+    password: "{{ default_user_password}}"
+    email: "racheli.schechter@gmail.com"
+  - name: yonatan
+    comment: "Yonatan Schechter"
+    password: "{{ default_user_password}}"
 
 samba_enabled: true
 samba_shares_root: /mnt/storage/samba # We don't want it in Mount - we want it in the pools
 samba_server_string: "DSM NAS"
 samba_users:
   - name: arnon
-    password: "P@ssw0rd"
+    password: "{{ default_user_password}}"
   - name: ava
-    password: "P@ssw0rd"
+    password: "{{ default_user_password}}"
   - name: yael
-    password: "P@ssw0rd"
+    password: "{{ default_user_password}}"
+  - name: racheli
+    password: "{{ default_user_password}}"
+  - name: yonatan
+    password: "{{ default_user_password}}"
 
 # Shares you want published over Samba.
 samba_shares:
@@ -194,15 +203,10 @@ plex_enabled: true
 #  - "/dev/dri:/dev/dri"
 
 route53_ddns_enabled: false
-route53_key_id: "AKIAWTIF3ARN47QD5MQU"
-route53_secret_key: "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"
-route53_hosted_zone_id: "Z02933762Z5QX7AU5NGZQ"
 route53_host: "{{ansible_nas_hostname}}.{{ ansible_nas_domain }}"
 
 snapraid_install: true
 snapraid_runner: false
-snapraid_runner_email_address: "arnon.meshoulam@gmail.com"
-snapraid_runner_email_pass: "Tivon!23"
 snapraid_content_files:
   - /var/snapraid.content
 snapraid_data_disks:
@@ -254,8 +258,6 @@ ddclient_user: root
 ddns_config_files: []
 ddns_service: ""
 ddns_boot_at_start: false
-ddns_username: "arnon.meshoulam@gmail.com"
-ddns_password: "Mashov123"
 
 # Gmail Credentials
 google_domain_protocol: "googledomains"
