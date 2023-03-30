@@ -49,6 +49,6 @@
     groups: users
     state: present
     password: "{{ item.password  | password_hash('sha512') }}"
-    append: true
+    append: false
     shell: /bin/bash
   loop: "{{ regular_users }}"
