@@ -21,6 +21,8 @@
       file:
         path: "{{ item }}"
         state: directory
+        owner: "{{bazarr_user_id}}"
+        group: "{{bazar_group_id}}"
       with_items:
         - "{{ bazarr_data_directory }}"
 
