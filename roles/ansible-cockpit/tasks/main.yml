@@ -1,0 +1,24 @@
+---
+- name: Add cockpit modules
+  block:
+    # - name: Install cockpit-docker
+    # apt:
+    #   name: "cockpit-podman"
+    #   state: present
+    - name: Stop Cockpit
+      service:
+        name: "cockpit"
+        enabled: true
+        state: "stop"
+
+    - name: Download plugin from git
+      ansible.builtin.apt:
+        deb: "https://launchpad.net/ubuntu/+source/cockpit/215-1~ubuntu19.10.1/+build/18889196/+files/cockpit-docker_215-1~ubuntu19.10.1_all.deb"
+
+    - name: Restart Cockpit
+      service:
+        name: "cockpit"
+        enabled: true
+        state: "started"
+
+  when: cockpit_enabled is true
