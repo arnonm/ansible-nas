@@ -4,12 +4,13 @@ bazarr_available_externally: false
 
 # directories
 bazarr_data_directory: "{{ docker_home }}/bazarr/config"
+bazarr_compose_directory: "{{ docker_home }}/bazarr/config"
 bazarr_tv_directory: "{{ tv_root }}"
 bazarr_movies_directory: "{{ movies_root }}"
 
 # uid/gid
-bazarr_user_id: "0"
-bazarr_group_id: "0"
+bazarr_user_id: "1311"
+bazarr_group_id: "1311"
 
 # network
 bazarr_port: "6767"

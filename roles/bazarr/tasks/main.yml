@@ -1,6 +1,22 @@
 ---
 - name: Start Bazarr
   block:
+    - name: Create Bazarr group
+      group:
+        name: bazarr
+        gid: "{{ bazarr_group_id }}"
+        state: present
+
+    - name: Create bazarr user
+      user:
+        name: bazarr
+        uid: "{{ bazarr_user_id }}"
+        state: present
+        system: yes
+        update_password: on_create
+        create_home: no
+        group: bazarr
+
     - name: Create Bazarr Directories
       file:
         path: "{{ item }}"
@@ -8,30 +24,23 @@
       with_items:
         - "{{ bazarr_data_directory }}"
 
-    - name: Bazarr
-      docker_container:
-        name: "{{ bazarr_container_name }}"
-        image: linuxserver/bazarr
-        pull: true
-        volumes:
-          - "{{ bazarr_tv_directory }}:/tv:rw"
-          - "{{ bazarr_movies_directory }}:/movies:rw"
-          - "{{ bazarr_data_directory }}:/config:rw"
-        ports:
-          - "{{ bazarr_port }}:6767"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-          PUID: "{{ bazarr_user_id }}"
-          PGID: "{{ bazarr_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ bazarr_memory }}"
-        labels:
-          traefik.enable: "{{ bazarr_available_externally | string }}"
-          traefik.http.routers.bazarr.rule: "Host(`{{ bazarr_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.bazarr.tls.certresolver: "letsencrypt"
-          traefik.http.routers.bazarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.bazarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.services.bazarr.loadbalancer.server.port: "6767"
+    - name: Template over docker-compose.yml file
+      template:
+        src: templates/docker-compose.yml
+        dest: "{{bazarr_compose_directory}}/docker-compose.yml"
+        owner: "{{ bazarr_user_id }}"
+        group: "{{ bazarr_group_id }}"
+
+    - name: Build Bazzar
+      docker_compose:
+        state: present
+        build: yes
+        project_src: "{{ bazarr_compose_directory }}"
+
+    - name: Start Bazarr
+      docker_compose:
+        build: no
+        project_src: "{{ bazarr_compose_directory }}"
   when: bazarr_enabled is true
 
 - name: Stop Bazarr
