@@ -1,19 +1,21 @@
 ---
+letsencrypt_enabled: false
+
 # Options are via certbot or via ansible
 letsencrypt_install: "certbot"
 # letsencrypt_install: "ansible"
-letsencrypt_renewal_enabled: trues
+letsencrypt_renewal_enabled: true
 
 acme_challenge_type: http-01
 acme_directory: https://acme-v02.api.letsencrypt.org/directory
 acme_version: 2
-acme_email: "certificate-reminders@your-domain"
+acme_email: "{{ansible_nas_email}}"
 letsencrypt_dir: "/etc/letsencrypt"
 letsencrypt_keys_dir: "/etc/letsencrypt/keys"
 letsencrypt_csrs_dir: "/etc/letsencrypt/csrs"
 letsencrypt_certs_dir: "/etc/letsencrypt/certs"
 letsencrypt_account_key: "/etc/letsencrypt/account/account.key"
-domain_name: ""
+domain_name: " {{ansible_nas_domain}}"
 
-certbot_path: "/usr/local/bin/certbot"
+certbot_path: "/usr/bin/certbot"
 RandomizedDelaySec: "1h"

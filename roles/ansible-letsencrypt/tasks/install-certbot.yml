@@ -14,25 +14,10 @@
 
 - name: Install certbot ddns_packages
   apt:
-    name: "python3 python3-venv libaugeas0"
+    name: "python3, libaugeas0, python3-certbot"
     state: present
   register: result
   until: result is succeeded
-
-- name: Install certbot python module
-  pip:
-    name: certbot
-    state: present
-  register: result
-  until: result is succeeded
-
-- name: Create symbolic link to /usr/local/bin
-  ansible.builtin.file:
-    src: /opt/certbox/bin/certbot
-    dest: /usr/local/bin/certbot
-    owner: root
-    group: root
-    state: link
 
 - name: Request certificate
   shell: "{{certbot_path }} certonly --standalone --domains {{ domain_name }} --email {{ acme_email }} --agree-tos -n"

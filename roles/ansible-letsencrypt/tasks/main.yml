@@ -1,8 +1,15 @@
 ---
-- name: install via certbox
-  include_tasks: install-certbox.yml
-  when: letsencrypt_install == 'certbot'
+- name: install letsencrypt Certificates
+  block:
+    - name: debug
+      debug:
+        msg: letsencrypt_install
 
-- name: install via ansible
-  include_tasks: install-ansbile.yml
-  when: letsencrypt_install == ansible'
+    - name: install via certbox
+      include_tasks: roles/ansible-letsencrypt/tasks/install-certbot.yml
+      when: letsencrypt_install == 'certbot'
+
+    - name: install via ansible
+      include_tasks: roles/ansible-letsencrypt/tasks/install-ansible.yml
+      when: letsencrypt_install == 'ansible'
+  when: (letsencrypt_enabled is true)
