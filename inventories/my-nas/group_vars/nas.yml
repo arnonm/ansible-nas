@@ -11,37 +11,10 @@
 
 # Ansible options
 ansible_nas_hostname: hda
-#ansible_nas_fqdn: dsmhome.ddns.net
 ansible_nas_timezone: "Asia/Jerusalem"
-ansible_nas_user: hda_admin
-ansible_nas_email: arnon.meshoulam@gmail.com
-# ansible_nas_domain: "dsmhome.ddns.net"
-ansible_nas_domain: "dsmhome.com"
-ansible_nas_fqdn: "{{ansible_nas_hostname}}.{{ansible_nas_domain}}"
 
 primary_user: "hda_admin"
 ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5MmEhwd7q59uGEyeX2VajxXdU/MXPmYD5on7Gfn+WIFREnYbnstQKxrpyk78UikW1V9diNU0qBIGbnpXyzlCGMz3tMH4+SNxSbBmKCVR4itMscyoMBIhOUjyl/OF7idYrNQa95BV/MArh/n6XN1wpJywqTTR++Clhex4o32DeqTUDpNQhTkpmjJTFLi7JK13NcSCUO2ceFNsP6FiKlgrlliTErEf6qdCi/HqBmQgXBn75YvVG7771bElzGlI/XkyCmSOo/bDU+4y6M9D5HecK64YNHG1g8ipZaPekbUZqUo5LjNlhPIsIZqTHz8J0Ld0vE2MO4ByH5TSkUreRgS0T creating SSH"
-
-regular_users:
-  - name: ava
-    comment: "Ava Diamond"
-    password: "{{ default_user_password}}"
-    email: "avadiamond@gmail.com"
-  - name: yael
-    comment: "Yael Meshoulam"
-    password: "{{ default_user_password}}"
-    email: "yael.meshoulam@gmail.com"
-  - name: arnon
-    comment: "Arnon Meshoulam"
-    password: "{{ default_user_password}}"
-    email: "arnon.meshoulam@gmail.com"
-  - name: racheli
-    comment: "Rachel Schechter"
-    password: "{{ default_user_password}}"
-    email: "racheli.schechter@gmail.com"
-  - name: yonatan
-    comment: "Yonatan Schechter"
-    password: "{{ default_user_password}}"
 
 samba_enabled: true
 samba_shares_root: /mnt/storage/samba # We don't want it in Mount - we want it in the pools
