@@ -26,7 +26,7 @@ photoprism_memory: "2g"
 # photoprism_devices:
 #  - "/dev/dri:/dev/dri"
 photoprism_port: 2345
-photoprism_database_dir:
+photoprism_database_dir: "{{ mandatory }}"
 photoprism_database_name: "photoprism"
 photoprism_database_user: "photoprism"
 photoprism_password: "insecure"

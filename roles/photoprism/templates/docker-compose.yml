@@ -51,13 +51,13 @@ services:
       - apparmor:unconfined
     ports:
       - "2345:2345" # HTTP port (host:container)
-    user:  "{{photoprism_user_id}} :100"
+    user:  "{{photoprism_user_id}}:100"
     labels:
       - "traefik.enable = {{ photoprism_available_externally | string }}"
       - "traefik.http.routers.photoprism.rule=Host(`{{ansible_nas_fqdn}}`) && PathPrefix(`{{photoprism_path}}`)"
       - "traefik.http.routers.photoprism.entrypoints=web,websecure"
         #- "traefik.http.routers.photoprism.tls=true"
-      - "traefik.http.routers.photoprism.tls.certresolver=myresolver"
+      - "traefik.http.routers.photoprism.tls.certresolver=acme"
     environment:
       PHOTOPRISM_ADMIN_PASSWORD: "Mashov123"         # YOUR INITIAL ADMIN PASSWORD (MINIMUM 8 CHARACTERS, USERNAME "admin")
       PHOTOPRISM_SITE_URL: "/photoprism"             # public server URL incl http:// or https:// and /path, :port is optional
@@ -94,8 +94,8 @@ services:
       # PHOTOPRISM_FFMPEG_ENCODER: "software"        # FFmpeg encoder ("software", "intel", "nvidia", "apple", "raspberry")
       # PHOTOPRISM_FFMPEG_BITRATE: "32"              # FFmpeg encoding bitrate limit in Mbit/s (default: 50)
       ## Switch to a non-root user after initialization (supported IDs are 33, 50-99, 500-600, and 900-1200):
-      PHOTOPRISM_UID: "{{ photoprism_user_id | default(omit) }}"
-      PHOTOPRISM_GID: "{{ photoprism_group_id | default(omit) }}"
+      #PHOTOPRISM_UID: "{{ photoprism_user_id | default(omit) }}"
+      #PHOTOPRISM_GID: "{{ photoprism_group_id | default(omit) }}"
       TZ: "{{ ansible_nas_timezone }}"
       # PHOTOPRISM_UMASK: 0000
     ## Start as a non-root user before initialization (supported IDs are 33, 50-99, 500-600, and 900-1200):
