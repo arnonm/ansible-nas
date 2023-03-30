@@ -11,11 +11,13 @@
 
 # Ansible options
 ansible_nas_hostname: hda
-ansible_nas_fqdn: dsm.dsmhome.com
-ansible_nas_timezone: Asia/Jerusalem
+#ansible_nas_fqdn: dsmhome.ddns.net
+ansible_nas_timezone: "Asia/Jerusalem"
 ansible_nas_user: hda_admin
 ansible_nas_email: arnon.meshoulam@gmail.com
+# ansible_nas_domain: "dsmhome.ddns.net"
 ansible_nas_domain: "dsmhome.com"
+ansible_nas_fqdn: "{{ansible_nas_hostname}}.{{ansible_nas_domain}}"
 
 primary_user: "hda_admin"
 ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5MmEhwd7q59uGEyeX2VajxXdU/MXPmYD5on7Gfn+WIFREnYbnstQKxrpyk78UikW1V9diNU0qBIGbnpXyzlCGMz3tMH4+SNxSbBmKCVR4itMscyoMBIhOUjyl/OF7idYrNQa95BV/MArh/n6XN1wpJywqTTR++Clhex4o32DeqTUDpNQhTkpmjJTFLi7JK13NcSCUO2ceFNsP6FiKlgrlliTErEf6qdCi/HqBmQgXBn75YvVG7771bElzGlI/XkyCmSOo/bDU+4y6M9D5HecK64YNHG1g8ipZaPekbUZqUo5LjNlhPIsIZqTHz8J0Ld0vE2MO4ByH5TSkUreRgS0T creating SSH"
@@ -37,7 +39,7 @@ regular_users:
     email: "arnon.meshoulam@gmail.com"
 
 samba_enabled: true
-samba_shares_root: /mnt/Pool1/samba # We don't want it in Mount - we want it in the pools
+samba_shares_root: /mnt/storage/samba # We don't want it in Mount - we want it in the pools
 samba_server_string: "DSM NAS"
 samba_users:
   - name: arnon
@@ -116,32 +118,50 @@ samba_shares:
 nfs_shares_root:
 nfs_exports:
 
+###
+### Brazarr
+###
+brazarr_enabled: true
+bazarr_data_directory: "{{ docker_home }}/bazarr/config"
+bazarr_compose_directory: "{{ docker_home }}/bazarr/config"
+
+###
+### Cockpit
+###
 cockpit_enabled: true
 cockpit_started: true
 cockpit_port: 9090
 cockpit_packages: full
 
-mergerfs_enabled: false
+###
+### Mergefs
+###
+mergerfs_enabled: true
 mergerfs_install_mode: package_manager
-
+mergerfs_minfreespace: "2G"
+mergerfs_fsname: "mergefs"
 mergerfs_mounts:
   - path: /mnt/storage
     branches:
-      - /mnt/data*
-      - /mnt/other
-    options: allow_other,use_ino
-    mergerfs_mounts: []
+      - /mnt/disk*
+    options: defaults,allow_other,use_ino,cache.files=partial,dropcacheonclose=true,category.create=mfs,minfreespace={{mergerfs_minfreespace}},fsname={{mergerfs_fsname}}
 
+###
+### Docker
+###
 docker_users:
   - arnon
 
 # Area for all the configuration files of the applicaiton in containers
-docker_home: /mnt/Volume2/docker
+docker_home: /mnt/storage/docker
 # Area of all the containers themselves
 docker_image_directory: "{{ docker_home }}/data"
 
-## Enable some applications
+###
+### Traefik
+###
 traefik_enabled: true
+certEmail: "{{ ansible_nas_email }}"
 
 portainer_enabled: true
 portainer_data_directory: "{{ docker_home }}/portainer/config"
@@ -150,10 +170,12 @@ photoprism_enabled: true
 photoprism_available_externally: true
 photoprism_compose_directory: "{{ docker_home }}/prism/config"
 photoprism_storage: "{{ docker_home }}/prism/storage"
+photoprism_database_dir: "{{ docker_home }}/prism/db"
 photoprism_photos_directory: "{{ photos_root }}"
 photoprism_config_directory: "{{ docker_home }}/prism/config"
+photoprism_hostname: "https://{{ansible_nas_fqdn}}"
 
-heimdall_enabled: false
+heimdall_enabled: true
 heimdall_port_http: 8081
 heimdall_data_directory: "{{ docker_home }}/heimdall" # Needs to be changed
 
@@ -188,13 +210,14 @@ snapraid_data_disks:
     content: true
   - path: /mnt/disk2
     content: true
-  - path: /mnt/disk3
-  - path: /mnt/disk4
-
+  # - path: /mnt/disk3
+  # - path: /mnt/disk4
 snapraid_parity_disks:
   - path: /mnt/parity1
     content: true
 
+## Keys for ansible-disk
+disk_enabled: false
 additional_fs_utils:
   - xfsprogs # package for mkfs.xfs on RedHat / Ubuntu
   - btrfs-progs # package for mkfs.btrfs on CentOS / Debian
@@ -203,19 +226,28 @@ disk_additional_disks:
   - disk: /dev/sdb
     fstype: ext4
     mount_options: defaults
-    mount: /mnt/2isk1
-    #  user: www-data
-    #  group: www-data
-    #  mode: "0755"
+    mount: /mnt/parity1
+    user: root
+    group: root
+    mode: "0755"
     #  disable_periodic_fsck: false
   - disk: /dev/sdc
-    #  part: /dev/nvme0n1p1
+    fstype: ext4
+    mount_options: defaults
+    mount: /mnt/disk1
+    user: root
+    group: root
+    mode: "0755"
+  - disk: /dev/sdd
     fstype: ext4
     mount_options: defaults
     mount: /mnt/disk2
+    user: root
+    group: root
+    mode: "0755"
 disk_enable_partioning: false
 
-ansible_ddns_enabled: true
+ansible_ddns_enabled: false
 ddns_client: "duc"
 ddns_packages: []
 ddclient_user: root
@@ -236,3 +268,5 @@ timemachine_data_directory: "{{samba_shares_root}}/timemachine"
 
 webmin_enabled: false
 webmin_base_dir: "/usr/share/webmin"
+
+letsencrypt_enabled: true
