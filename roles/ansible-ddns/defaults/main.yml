@@ -1,7 +1,7 @@
 ---
 dns_client_enabled: false
 
-ddns_client: google_ddns
+ddns_client: "google_ddns"
 
 ddns_packages: []
 
@@ -9,7 +9,7 @@ ddclient_user: root
 
 ddns_config_files: []
 
-ddns_service: ""
+ddns_service: "{{ mandatory }}"
 
 # Gmail Credentials
 google_domain_protocol: "googledomains"

@@ -1,27 +1,25 @@
 ---
-- name: Untar DUC client
-  ansible.builtin.unarchive:
-    src: { { download_url } }
-    dest: /tmp
-    remote_src: yes
+- name: Install DUC (NOIP) client
+  block:
+    - name: Download DUC client
+      ansible.builtin.unarchive:
+        src: "{{ download_url }}"
+        dest: /tmp
+        remote_src: yes
 
-- name: Build the default target
-  community.general.make:
-    chdir: "/tmp/{{client_dir}}"
+    - name: Install package
+      apt:
+        deb: "/tmp/{{deb_package}}"
+        state: present
 
-- name: Run 'install' target as root
-  community.general.make:
-    chdir: "/tmp/{{client_dir}}"
-    target: install
-  become: true
+    - name: Create configuration file
+      shell: /usr/bin/noip-duc  --username "{{ ddns_username }}" --password "{{ ddns_password }}" --once
 
-- name: Create configuration file
-  shell:
-    cmd: "usr/local/bin/noip2 -C -U 30 -u {{ username }} -p {{ password }} "
+    - name: set to run ddns on boot
+      ansible.builtin.systemd:
+        name: "{{service_name}}"
+        state: started
+        enabled: true
+      when: ddns_boot_at_start is true
 
-- name: set to run ddns on boot
-  ansible.builtin.systemd:
-    name: "{{service_name}}"
-    state: started
-    enabled: true
-  when: ddns_boot_at_start is true
+  when: ddns_client == "duc"

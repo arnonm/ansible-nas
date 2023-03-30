@@ -1,0 +1,29 @@
+---
+- name: install ddns packages
+  package:
+    name: "{{ item }}"
+    state: present
+    use: "{{ package_override | default(omit) }}"
+  retries: 5
+  with_items:
+    - "{{ ddns_packages }}"
+  tags:
+    - install
+
+- name: template configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  with_items:
+    - "{{ ddns_config_files }}"
+  notify: restart ddns service
+  tags:
+    - config
+
+- name: flush handlers
+  meta: flush_handlers
+  tags:
+    - start-service
