@@ -35,7 +35,8 @@
 - name: Generate Docker daemon.json
   copy:
     dest: /etc/docker/daemon.json
-    content: "{{ docker_daemon_json | to_nice_json }}"
+    # content: "{{ docker_daemon_json | to_nice_json }}"
+    content: ""
   register: docker_config
 
 - name: Install docker-compose
