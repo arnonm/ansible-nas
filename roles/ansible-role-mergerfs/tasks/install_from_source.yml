@@ -1,0 +1,76 @@
+---
+# Note: we don't use the GitHub API to retrieve the latest version because
+# it has rate limits which are hard to avoid in CI (we need a token, authenticate
+# with the API, etc.). Instead, we browse the latest release url which redirects
+# to the release page, where we can find the version number in the URL.
+- name: Install Mergerfs
+  block:
+    - become: false
+      delegate_to: localhost
+      run_once: true
+      block:
+        - name: Get latest release information from GitHub
+          uri:
+            url: "{{ mergerfs_github_releases_url }}/latest"
+          register: mergerfs_github_release_page
+
+        - name: Set latest mergerfs version fact
+          set_fact:
+            mergerfs_version: "{{ mergerfs_github_release_page['url'].split('/')[-1] }}"
+      when: mergerfs_version == "latest"
+
+    - set_fact:
+        install_dir: "mergerfs-{{mergerfs_version}}"
+
+    - set_fact:
+        full_path: "{{top_install_path}}/{{install_dir}}"
+
+    - name: "Create required directories in /usr/local/src"
+      file:
+        path: "/usr/local/src/{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: u=rwx,g=x,o=x
+      with_items:
+        - "mergerfs"
+        - "mergerfs/{{ install_dir }}"
+
+    - name: Determine package download url
+      become: false
+      delegate_to: localhost
+      run_once: true
+      # https://github.com/trapexit/mergerfs/releases
+      # https://github.com/trapexit/mergerfs/archive/refs/tags/2.35.0.tar.gz
+      set_fact:
+        mergerfs_package_url: "{{ mergerfs_github_url }}/archive/refs/tags/{{ mergerfs_version }}.tar.gz"
+
+    - name: "Git checkout"
+      become: true
+      git:
+        repo: "{{mergerfs_github_url}}.git"
+        dest: "{{full_path}}"
+        version: "{{mergerfs_version}}"
+      register: gitchange
+
+    - name: install dependencies
+      become: true
+      ansible.builtin.command:
+        chdir: "{{full_path}}"
+        cmd: "tools/install-build-pkgs"
+
+    - name: build
+      become: true
+      ansible.builtin.command:
+        chdir: "{{full_path}}"
+        cmd: "make deb"
+      when: gitchange.changed
+
+    - name: Install mergerfs package with yum
+      become: true
+      apt:
+        # deb: "/usr/local/src/mergerfs_2.35.0~ubuntu-kinetic_amd64.deb"
+        deb: "{{top_install_path}}/{{mergerfs_pkg_prefix}}{{ mergerfs_version }}{{mergerfs_pkg_suffix_from_src}}"
+        state: present
+        update_cache: true
+  when: not ansible_check_mode
