@@ -119,7 +119,8 @@ cockpit_packages: full
 ### Mergefs
 ###
 mergerfs_enabled: true
-mergerfs_install_mode: package_manager
+# mergerfs_install_mode: package_manager
+mergerfs_install_mode: "source"
 mergerfs_minfreespace: "2G"
 mergerfs_fsname: "mergefs"
 mergerfs_mounts:
@@ -194,7 +195,7 @@ snapraid_parity_disks:
     content: true
 
 ## Keys for ansible-disk
-disk_enabled: false
+disk_enabled: true
 additional_fs_utils:
   - xfsprogs # package for mkfs.xfs on RedHat / Ubuntu
   - btrfs-progs # package for mkfs.btrfs on CentOS / Debian
