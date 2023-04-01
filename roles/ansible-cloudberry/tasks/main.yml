@@ -1,0 +1,21 @@
+---
+- name: Install Cloud Berry
+  block:
+    - name: Copy package to host
+      copy:
+        remote_src: false
+        src: "{{ local_dep_filename }}"
+        dest: /tmp/
+
+    - name: Download and install package
+      apt:
+        deb: "/tmp/{{ local_dep_filename }}"
+        state: present
+        update_cache: true
+
+    - name: Register Licenese
+      ansible.builtin.command:
+        chdir: "{{cloudberry_path}}"
+        cmd: './cbb activateLicense  -t "{{license_type}}" -k "{{license_key}}" '
+
+  when: cloudberry_enabled is true

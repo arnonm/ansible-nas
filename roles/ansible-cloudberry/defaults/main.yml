@@ -1,0 +1,7 @@
+---
+local_dep_filename: "ubuntu14_CloudBerryLab_CloudBerryBackup_v4.1.0.103_20230310.deb"
+cloudberry_path: "/opt/local/CloudBerry Backup/bin"
+license_email: "arnon.meshoulam@mgail.com"
+license_type: "server"
+license_key: "b6260b2f-412d-4266-b5d6-afc575aac4fd"
+cloudberry_enabled: false
