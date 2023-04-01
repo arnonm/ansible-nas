@@ -1,6 +1,7 @@
 tests/test.yml
 site
 .vagrant
+.DS_Store
 *.retry
 *.log
 .cache
