@@ -5,20 +5,43 @@
     # apt:
     #   name: "cockpit-podman"
     #   state: present
+    - name: collect facts about system services
+      systemd:
+        name: "cockpit"
+      register: services_state
+
     - name: Stop Cockpit
       service:
         name: "cockpit"
         enabled: true
-        state: "stop"
+        state: "stopped"
+      when: services_state.status.SubState == "running"
 
-    - name: Download plugin from git
-      ansible.builtin.apt:
-        deb: "https://launchpad.net/ubuntu/+source/cockpit/215-1~ubuntu19.10.1/+build/18889196/+files/cockpit-docker_215-1~ubuntu19.10.1_all.deb"
+    - become: false
+      delegate_to: localhost
+      run_once: true
+      block:
+        - name: Get latest release information from GitHub
+          uri:
+            url: "{{ cockpit_docker_github_releases_url }}/latest"
+          register: cockpit_docer_github_release_page
+
+        - name: Set latest cockpit-docker version fact
+          set_fact:
+            cockpit_docker_version: "{{ cockpit_docer_github_release_page['url'].split('/')[-1] }}"
+      when: cockpit_docker_version == "latest"
+
+    - name: get and extract package from the internet
+      ansible.builtin.unarchive:
+        src: "{{cockpit_docker_github_releases_url}}/download/{{cockpit_docker_version}}/cockpit-docker.tar.gz"
+        dest: /usr/share/cockpit
+        remote_src: yes
 
     - name: Restart Cockpit
       service:
         name: "cockpit"
         enabled: true
         state: "started"
+      when: services_state.status.ActiveState == "active"
 
   when: cockpit_enabled is true
