@@ -132,7 +132,7 @@
     - role: ansible-cockpit
       tags:
         - cockpit
-      when: (cockpit2_enabled | default(False))
+      when: (cockpit_enabled | default(False))
 
     - role: couchpotato
       tags:
@@ -525,3 +525,8 @@
       tags:
         - znc
       when: (znc_enabled | default(False))
+
+    - role: ansible-cloudberry
+      tags: 
+        - ansible-cloudberry
+      when: (cloudberry_enabled | default(False))
