@@ -31,7 +31,6 @@
         state: directory
         owner: root
         group: root
-        mode: u=rwx,g=x,o=x
       with_items:
         - "mergerfs"
         - "mergerfs/{{ install_dir }}"
@@ -40,18 +39,23 @@
       become: false
       delegate_to: localhost
       run_once: true
-      # https://github.com/trapexit/mergerfs/releases
-      # https://github.com/trapexit/mergerfs/archive/refs/tags/2.35.0.tar.gz
-      set_fact:
-        mergerfs_package_url: "{{ mergerfs_github_url }}/archive/refs/tags/{{ mergerfs_version }}.tar.gz"
+      # https://github.com/trapexit/mergerfs/releases/download/2.35.0/mergerfs-2.35.0.tar.gz
 
-    - name: "Git checkout"
-      become: true
-      git:
-        repo: "{{mergerfs_github_url}}.git"
-        dest: "{{full_path}}"
-        version: "{{mergerfs_version}}"
-      register: gitchange
+      set_fact:
+        mergerfs_package_url: "{{ mergerfs_github_url }}/releases/download/{{ mergerfs_version }}/mergerfs-{{mergerfs_version}}.tar.gz"
+
+    # - name: "Git checkout"
+    #   become: true
+    #   git:
+    #     repo: "{{mergerfs_github_url}}.git"
+    #     dest: "{{full_path}}"
+    #     version: "{{mergerfs_version}}"
+    #   register: gitchange
+    - name: Copy source files
+      ansible.builtin.unarchive:
+        src: "{{ mergerfs_package_url }}"
+        dest: "{{ top_install_path }}"
+        remote_src: yes
 
     - name: install dependencies
       become: true
@@ -64,9 +68,11 @@
       ansible.builtin.command:
         chdir: "{{full_path}}"
         cmd: "make deb"
-      when: gitchange.changed
 
-    - name: Install mergerfs package with yum
+    - set_fact:
+        mergerfs_pkg_suffix_from_src: "~debian-buster_{{mergerfs_arch}}.deb"
+
+    - name: Install mergerfs package with apt
       become: true
       apt:
         # deb: "/usr/local/src/mergerfs_2.35.0~ubuntu-kinetic_amd64.deb"
