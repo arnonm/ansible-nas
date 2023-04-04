@@ -56,6 +56,7 @@
         src: "{{ mergerfs_package_url }}"
         dest: "{{ top_install_path }}"
         remote_src: yes
+      register: source_files
 
     - name: install dependencies
       become: true
@@ -63,19 +64,31 @@
         chdir: "{{full_path}}"
         cmd: "tools/install-build-pkgs"
 
+    - name: Work around for merferfs issue of debian-buster
+      become: true
+      ansible.builtin.shell:
+        chdir: "{{full_path}}"
+        cmd: "sed -i 's/debian/{{ ansible_distribution|lower }}/g' {{full_path}}/ChangeLog"
+      # when: source_files.changed
+
+    - name: Work around part 2
+      become: true
+      ansible.builtin.command: 
+        chdir: "{{full_path}}"
+        cmd: "sed -i 's/buster/{{ ansible_distribution_release }}/g' {{full_path}}/ChangeLog"
+      # when: source_files.changed
+
     - name: build
       become: true
       ansible.builtin.command:
         chdir: "{{full_path}}"
         cmd: "make deb"
+   #   when: source_files.changed
 
-    - set_fact:
-        mergerfs_pkg_suffix_from_src: "~debian-buster_{{mergerfs_arch}}.deb"
 
     - name: Install mergerfs package with apt
       become: true
       apt:
-        # deb: "/usr/local/src/mergerfs_2.35.0~ubuntu-kinetic_amd64.deb"
         deb: "{{top_install_path}}/{{mergerfs_pkg_prefix}}{{ mergerfs_version }}{{mergerfs_pkg_suffix_from_src}}"
         state: present
         update_cache: true
