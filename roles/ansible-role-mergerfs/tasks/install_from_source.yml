@@ -69,22 +69,26 @@
       ansible.builtin.shell:
         chdir: "{{full_path}}"
         cmd: "sed -i 's/debian/{{ ansible_distribution|lower }}/g' {{full_path}}/ChangeLog"
-      # when: source_files.changed
 
     - name: Work around part 2
       become: true
       ansible.builtin.command: 
         chdir: "{{full_path}}"
         cmd: "sed -i 's/buster/{{ ansible_distribution_release }}/g' {{full_path}}/ChangeLog"
-      # when: source_files.changed
 
     - name: build
       become: true
       ansible.builtin.command:
         chdir: "{{full_path}}"
         cmd: "make deb"
-   #   when: source_files.changed
+      when: source_files.changed
 
+
+    - name: Unmount mergerfs to update version if source files source_files changed 
+      ansible.posix.mount:
+        path: "{{mergerfs_mounts[0]['path'] | mandatory}}"
+        state: unmounted
+      # when: source_files.changed
 
     - name: Install mergerfs package with apt
       become: true
