@@ -32,7 +32,7 @@
 
     - role: ansible-role-snapraid
       tags:
-        - snapraid
+        - ansible-snapraid
         - skip_ansible_lint
       when: (snapraid_enabled | default(False))
 
@@ -527,6 +527,6 @@
       when: (znc_enabled | default(False))
 
     - role: ansible-cloudberry
-      tags: 
+      tags:
         - ansible-cloudberry
       when: (cloudberry_enabled | default(False))

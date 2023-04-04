@@ -179,8 +179,9 @@ plex_enabled: true
 route53_ddns_enabled: false
 route53_host: "{{ansible_nas_hostname}}.{{ ansible_nas_domain }}"
 
+snapraid_enabled: true
 snapraid_install: true
-snapraid_runner: false
+snapraid_runner: true
 snapraid_content_files:
   - /var/snapraid.content
 snapraid_data_disks:
