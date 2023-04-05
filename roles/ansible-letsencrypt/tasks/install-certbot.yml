@@ -19,13 +19,30 @@
   register: result
   until: result is succeeded
 
+# Check if nginx is running if so install python3-certbot-nginx
+
+- name: Gathering service facts
+  service_facts:
+
+- name: stop nginx if it is running  
+  service: 
+    name: nginx
+    state: stopped
+  ignore_errors: true 
+
+- name: stop apache2 if it is running  
+  service: 
+    name: apache2
+    state: stopped
+  ignore_errors: true 
+
 - name: Request certificate
   shell: "{{certbot_path }} certonly --standalone --domains {{ domain_name }} --email {{ acme_email }} --agree-tos -n"
-  become: yes
+  become: true
 
 - name: Verify certificates
   shell: '{{certbot_path}}  certificates | grep "Certificate Name: {{domain_name}} " '
-  become: yes
+  become: true
 
 - name: Add scripts to renew certificates
   block:
@@ -50,19 +67,6 @@
         name: certbot.timer
         enabled: true
   when: letsencrypt_renewal_enabled is true
-#cp /etc/letsencrypt/live/$FQDN/fullchain.pem /etc/cockpit/ws-certs.d/$FQDN.crt
-#cp /etc/letsencrypt/live/$FQDN/privkey.pem /etc/cockpit/ws-certs.d/$FQDN.key
-# Note: The user and group may be different
-# chown cockpit-ws:cockpit-ws /etc/cockpit/ws-certs.d/$FQDN.crt /etc/cockpit/ws-certs.d
-
-#/etc/letsencrypt/renewal-hooks/post/001-restart-cockpit.sh⌗
-#!/usr/bin/env bash
-
-# echo "SSL certificates renewed"
-
-# cp /etc/letsencrypt/live/$FQDN/fullchain.pem /etc/cockpit/ws-certs.d/$FQDN.crt
-# cp /etc/letsencrypt/live/$FQDN/privkey.pem /etc/cockpit/ws-certs.d/$FQDN.key
-# chown cockpit-ws:cockpit-ws /etc/cockpit/ws-certs.d/$FQDN.crt /etc/cockpit/ws-certs.d/$FQDN.key
 
 # echo "Restarting Cockpit"
 # systemctl restart cockpit
