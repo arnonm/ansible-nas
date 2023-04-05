@@ -10,7 +10,7 @@
 # Add your all.yml config overrides to this file. See group_vars/all.yml for all possible settings.
 
 # Ansible options
-ansible_nas_hostname: hda
+ansible_nas_hostname: dsmhome
 ansible_nas_timezone: "Asia/Jerusalem"
 
 primary_user: "hda_admin"
@@ -226,8 +226,8 @@ disk_additional_disks:
     mode: "0755"
 disk_enable_partioning: false
 
-ansible_ddns_enabled: false
-ddns_client: "duc"
+ansible_ddns_enabled: true
+ddns_client: "google_ddns"
 ddns_packages: []
 ddclient_user: root
 ddns_config_files: []
