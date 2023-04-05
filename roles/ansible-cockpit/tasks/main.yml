@@ -17,9 +17,10 @@
         state: "stopped"
       when: services_state.status.SubState == "running"
 
-    - become: false
+    - name: Get Github source
+      become: false
       delegate_to: localhost
-      run_once: true
+      srun_once: true
       block:
         - name: Get latest release information from GitHub
           uri:
