@@ -58,7 +58,7 @@
     enabled: false
     name: nginx
     state: stopped
-    ignore_errors: true
+  ignore_errors: true
 
 - name: Remove old packages from the cache
   apt:
