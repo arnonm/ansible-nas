@@ -20,7 +20,7 @@
     - name: Get Github source
       become: false
       delegate_to: localhost
-      srun_once: true
+      run_once: true
       block:
         - name: Get latest release information from GitHub
           uri:
