@@ -53,12 +53,12 @@
     line: "127.0.1.1 {{ ansible_nas_fqdn }} {{ ansible_nas_hostname }}"
     state: present
 
-- name: Disable nginx
-  service: 
-    enabled: false
-    name: nginx
-    state: stopped
-  ignore_errors: true
+# - name: Disable nginx
+#   service: 
+#     enabled: false
+#     name: nginx
+#     state: stopped
+#   ignore_errors: true
 
 - name: Remove old packages from the cache
   apt:
