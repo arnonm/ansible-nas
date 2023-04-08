@@ -99,13 +99,13 @@ samba_shares:
 
 nfs_shares_root:
 nfs_exports:
-
+torrents_root: "{{ samba_shares_root }}/dump/torrents"
 ###
 ### Brazarr
 ###
-brazarr_enabled: true
-bazarr_data_directory: "{{ docker_home }}/bazarr/config"
-bazarr_compose_directory: "{{ docker_home }}/bazarr/config"
+bazarr_enabled: true
+bazarr_data_directory: "{{ compose_home }}/bazarr/data"
+bazarr_compose_directory: "{{ compose_home }}/bazarr"
 
 ###
 ### Cockpit
@@ -136,48 +136,90 @@ docker_users:
   - arnon
 
 # Area for all the configuration files of the applicaiton in containers
-docker_home: /mnt/storage/docker
+docker_home: /var/lib/docker
+# docker_home: /mnt/storage/docker
 # Area of all the containers themselves
 docker_image_directory: "{{ docker_home }}/data"
+compose_home: /opt/local
 
 ###
 ### Traefik
 ###
 traefik_enabled: true
+traefik_data_directory: "{{ compose_home }}/traefik/data"
 certEmail: "{{ ansible_nas_email }}"
 
 portainer_enabled: true
-portainer_data_directory: "{{ docker_home }}/portainer/config"
+portainer_data_directory: "{{ compose_home }}/portainer/data"
 
 photoprism_enabled: true
 photoprism_available_externally: true
-photoprism_compose_directory: "{{ docker_home }}/prism/config"
-photoprism_storage: "{{ docker_home }}/prism/storage"
-photoprism_database_dir: "{{ docker_home }}/prism/db"
+photoprism_compose_directory: "{{ compose_home }}/prism/config"
+photoprism_storage: "{{ compose_home }}/prism/storage"
+photoprism_database_dir: "{{ compose_home }}/prism/db"
 photoprism_photos_directory: "{{ photos_root }}"
-photoprism_config_directory: "{{ docker_home }}/prism/config"
+photoprism_config_directory: "{{ compose_home }}/prism/config"
 photoprism_hostname: "https://{{ansible_nas_fqdn}}"
+photoprism_user_id: "1308"
+photoprism_group_id: "1308"
+photoprism_path: "/photoprism"
+
 
 heimdall_enabled: true
 heimdall_port_http: 8081
-heimdall_data_directory: "{{ docker_home }}/heimdall" # Needs to be changed
+heimdall_data_directory: "{{ compose_home }}/heimdall" # Needs to be changed
+heimdall_user_id: "1310"
+heimdall_group_id: "1310"
 
 homer_enabled: false
 homer_port: "8082"
-homer_compose_directory: "{{samba_shares_root}}/homer"
+homer_compose_directory: "{{ compose_home }}/homer"
 
-bazarr_enabled: true
-radarr_enabled: true
+
 deluge_enabled: true
+eluge_config_directory: "{{ compose_home }}/deluge/config"
+deluge_download_directory: "{{ downloads_root }}"
+deluge_watch_directory: "{{ torrents_root }}"
+deluge_user_id: 1312
+deluge_group_id: 1312
+
+radarr_enabled: true
+radarr_download_directory: "{{ downloads_root }}"
+radarr_data_directory: "{{ compose_home }}/radarr/data"
+radarr_user_id: 1313
+radarr_group_id: 1313
+
+
 jackett_enabled: true
+jackett_data_directory: "{{ compose_home }}/jackett/data"
+jackett_torrents_root: "{{ torrents_root }}"
+
 sonarr_enabled: true
+sonarr_data_directory: "{{ compose_home }}/sonarr/data"
+sonarr_download_directory: "{{ downloads_root }}"
+sonarr_user_id: 1314
+sonarr_group_id: 1314
 
 plex_enabled: true
-#plex_devices:
-#  - "/dev/dri:/dev/dri"
+plex_config_directory: "{{ compose_home }}/plex/config"
+plex_tmp_directory: "{{ compose_home }}/tmp"
+plex_logs: "{{ compose_home }}/plex/logs"
+plex_data_directory: "{{ compose_home }}/plex/data"
+plex_movies_directory: "{{ movies_root }}"
+plex_tv_directory: "{{ tv_root }}"
+plex_photos_directory: "{{ photos_root }}"
+plex_podcasts_directory: "{{ podcasts_root }}"
+plex_music_directory: "{{ music_root }}"
+plex_audiobooks_directory: "{{ audiobooks_root }}"
+plex_compose_directory: "{{ compose_home }}/plex/config"
+plex_user_id: "1309"
+plex_group_id: "1309"
+plex_devices:
+ - "/dev/dri:/dev/dri"
 
 route53_ddns_enabled: false
 route53_host: "{{ansible_nas_hostname}}.{{ ansible_nas_domain }}"
+route53_data_directory: "{{ compose_home }}/route53_ddns"
 
 snapraid_enabled: true
 snapraid_install: true
@@ -229,7 +271,7 @@ disk_additional_disks:
 disk_enable_partioning: false
 
 ansible_ddns_enabled: true
-ddns_client: "google_ddns"
+ddns_client: "duc"
 ddns_packages: []
 ddclient_user: root
 ddns_config_files: []
@@ -248,6 +290,6 @@ timemachine_data_directory: "{{samba_shares_root}}/timemachine"
 webmin_enabled: false
 webmin_base_dir: "/usr/share/webmin"
 
-letsencrypt_enabled: false
+letsencrypt_enabled: true
 
 cloudberry_enabled: true
