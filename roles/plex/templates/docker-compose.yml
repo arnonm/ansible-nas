@@ -9,10 +9,14 @@ services:
       - PUID={{plex_user_id}}
       - PGID={{plex_group_id}}
       - VERSION={{ plex_version }}
-        #- PLEX_CLAIM = "claim-M8MmfkAsxcQCxZbSgq_C"
+      - PLEX_CLAIM = {{plex_claim}}
     volumes:
       - "{{plex_config_directory }}:/config"
       - "{{plex_tmp_directory }}:/transcode"
       - "{{plex_data_directory}}:/data"
+      - "{{plex_movies_directory}}:/movies"
+      - "{{plex_tv_directory}}:/tv"
+      - "{{plex_photos_directory}}:/photos"
+      - "{{plex_music_directory}}:/music"
     restart: unless-stopped
     
