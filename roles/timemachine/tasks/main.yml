@@ -1,8 +1,26 @@
 ---
+- name: Create timemachine group
+  group:
+    name: timemachine
+    gid: "{{ timemachine_group_id }}"
+    state: present
+
+- name: Create timemachine user
+  user:
+          name: timemachine
+          uid: "{{ timemachine_user_id }}"
+          state: present
+          system: yes
+          update_password: on_create
+          create_home: no
+          group: timemachine
+
 - name: Time Machine Directories
   file:
     path: "{{ timemachine_data_directory }}"
     state: directory
+    user: "{{timemachine_user_id}}"
+    group: "{{timemachine_group_id}}"
 
 - name: Time Machine Docker Container
   docker_container:
