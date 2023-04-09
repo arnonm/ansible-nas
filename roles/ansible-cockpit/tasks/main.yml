@@ -38,6 +38,10 @@
         dest: /usr/share/cockpit
         remote_src: yes
 
+    - name: Install samba module 
+      include_tasks: install_samba.yml
+      when: samba_enabled
+
     - name: Restart Cockpit
       service:
         name: "cockpit"

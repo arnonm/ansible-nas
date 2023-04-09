@@ -1,0 +1,65 @@
+---
+- name: Add Samba addon 
+  ansible.builtin.command:
+    chdir: /tmp
+    cmd:  "curl -sSL https://repo.45drives.com/setup | bash"
+  become: true
+
+- name: Update apt-cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+    register: result
+  until: result is succeeded
+    
+- name: Install some packages
+  apt:
+    name: "cockpit-file-sharing"
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: check if samba/smb.conf exists
+  stat: 
+    path: "{{samba_conf_file}}"
+  register: conf_exists 
+
+- name: Verify that smb.conf contains [Global] section 
+  lineinfile:
+    path: "{{samba_conf_file}}"
+    regexp: "include = registry"
+    line: "include = registry"
+    present: true
+  register: global_present
+  when: conf_exists is true
+
+- name: backup smb.conf file
+  ansible.builtin.copy:
+    src: "{{samba_conf_file}}"
+    dest: "{{samba_conf_file}}.bak"
+    remote_src: true
+  when: conf_exists and global_present
+
+- name: Run the net conf import command 
+  ansible.builtin.command:
+    chdir: /etc
+    cmd: "net conf import {{samba_conf_file}}"
+  when: conf_exists and global_present
+
+- name: replace with new smb.conf file 
+  template: 
+    src: "templates/smb.conf"
+    dest: "{{samba_conf_file}}"
+    user: root
+    group: root
+  when: conf_exists and global_present
+
+# Need to deal with the samba registry
+# Check if there exists a samba/smb.conf 
+# cehck if it includes [global] section - if so it is still in file format
+#  Back it up
+#  net conf import
+#  Write a new smb file if needed
+# Restart samba
+# add include = registry to etc/samba/smb.conf in global
+# import smb.conf into registry - net conf
