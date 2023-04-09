@@ -1,6 +1,22 @@
 ---
 - name: Start Deluge
   block:
+    - name: Create deluge group
+      group:
+        name: deluge
+        gid: "{{ deluge_group_id }}"
+        state: present
+
+      - name: Create deluge user
+        user:
+          name: deluge
+          uid: "{{ deluge_user_id }}"
+          state: present
+          system: yes
+          update_password: on_create
+          create_home: no
+          group: deluge
+
     - name: Create Deluge Directories
       file:
         path: "{{ item }}"
