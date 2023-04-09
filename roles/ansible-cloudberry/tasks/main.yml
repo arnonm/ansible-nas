@@ -16,6 +16,11 @@
     - name: Register Licenese
       ansible.builtin.command:
         chdir: "{{cloudberry_path}}"
-        cmd: './cbb activateLicense  -t "{{license_type}}" -k "{{license_key}}" '
+        cmd: './cbb activateLicense  -e "{{ansible_nas_email}}" -k "{{license_key}}" '
 
+    - name: Enabled web interface
+      ansible.builtin.command:
+        chdir: "{{cloudberry_path}}"
+        cmd: "./cbb option -set wa -http on"
+  
   when: cloudberry_enabled is true
