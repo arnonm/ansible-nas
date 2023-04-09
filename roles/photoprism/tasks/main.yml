@@ -17,7 +17,7 @@
           create_home: no
           group: prism
 
-      - name: Create prism Directories
+      - name: "Create prism Directories"
         file:
           path: "{{ item }}"
           state: directory

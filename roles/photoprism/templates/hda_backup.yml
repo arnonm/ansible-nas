@@ -39,8 +39,7 @@ version: '3.5'
 services:
   photoprism:
     ## Use photoprism/photoprism:preview for testing preview builds:
-    image: "photoprism/photoprism:latest"
-    container_name: "{{photoprism_container_name}}"
+    image: photoprism/photoprism:latest
     depends_on:
       - mariadb
     ## Don't enable automatic restarts until PhotoPrism has been properly configured and tested!
@@ -51,14 +50,14 @@ services:
       - seccomp:unconfined
       - apparmor:unconfined
     ports:
-      - "{{photoprism_port}}:2342" # HTTP port (host:container)
-    user:  "{{photoprism_user_id}}:100"
+      - "2345:2345" # HTTP port (host:container)
+    user: 33:100
     labels:
-      - "traefik.enable = {{ photoprism_available_externally | string }}"
-      - "traefik.http.routers.photoprism.rule=Host(`{{ansible_nas_fqdn}}`) && PathPrefix(`{{photoprism_path}}`)"
+      - "traefik.enable=true"
+      - "traefik.http.routers.photoprism.rule=Host(`dsmhome.ddns.net`) && PathPrefix(`/photoprism`)"
       - "traefik.http.routers.photoprism.entrypoints=web,websecure"
         #- "traefik.http.routers.photoprism.tls=true"
-      - "traefik.http.routers.photoprism.tls.certresolver=acme"
+      - "traefik.http.routers.photoprism.tls.certresolver=myresolver"
     environment:
       PHOTOPRISM_ADMIN_PASSWORD: "Mashov123"         # YOUR INITIAL ADMIN PASSWORD (MINIMUM 8 CHARACTERS, USERNAME "admin")
       PHOTOPRISM_SITE_URL: "/photoprism"             # public server URL incl http:// or https:// and /path, :port is optional
@@ -83,27 +82,26 @@ services:
       # PHOTOPRISM_DATABASE_DRIVER: "sqlite"         # SQLite is an embedded database that doesn't require a server
       PHOTOPRISM_DATABASE_DRIVER: "mysql"            # use MariaDB 10.5+ or MySQL 8+ instead of SQLite for improved performance
       PHOTOPRISM_DATABASE_SERVER: "mariadb:3306"     # MariaDB or MySQL database server (hostname:port)
-      PHOTOPRISM_DATABASE_NAME: "{{photoprism_database_name}}"         # MariaDB or MySQL database schema name
-      PHOTOPRISM_DATABASE_USER: "{{photoprism_database_user}}"         # MariaDB or MySQL database user name
-      PHOTOPRISM_DATABASE_PASSWORD: "{{photoprism_password}}"       # MariaDB or MySQL database user password
+      PHOTOPRISM_DATABASE_NAME: "photoprism"         # MariaDB or MySQL database schema name
+      PHOTOPRISM_DATABASE_USER: "photoprism"         # MariaDB or MySQL database user name
+      PHOTOPRISM_DATABASE_PASSWORD: "insecure"       # MariaDB or MySQL database user password
       PHOTOPRISM_SITE_CAPTION: "AI-Powered Photos App"
       PHOTOPRISM_SITE_DESCRIPTION: ""                # meta site description
-      PHOTOPRISM_SITE_AUTHOR: ""                     # meta site author
+     PHOTOPRISM_SITE_AUTHOR: ""                     # meta site author
       ## Run/install on first startup (options: update, gpu, tensorflow, davfs, clitools, clean):
       # PHOTOPRISM_INIT: "gpu tensorflow"
       ## Hardware Video Transcoding (for sponsors only due to high maintenance and support costs):
       # PHOTOPRISM_FFMPEG_ENCODER: "software"        # FFmpeg encoder ("software", "intel", "nvidia", "apple", "raspberry")
       # PHOTOPRISM_FFMPEG_BITRATE: "32"              # FFmpeg encoding bitrate limit in Mbit/s (default: 50)
       ## Switch to a non-root user after initialization (supported IDs are 33, 50-99, 500-600, and 900-1200):
-      #PHOTOPRISM_UID: "{{ photoprism_user_id | default(omit) }}"
-      #PHOTOPRISM_GID: "{{ photoprism_group_id | default(omit) }}"
-      TZ: "{{ ansible_nas_timezone }}"
+      PHOTOPRISM_UID: 33
+      # PHOTOPRISM_GID: 1011
       # PHOTOPRISM_UMASK: 0000
     ## Start as a non-root user before initialization (supported IDs are 33, 50-99, 500-600, and 900-1200):
     # user: "1000:1000"
     ## Share hardware devices with FFmpeg and TensorFlow (optional):
-    devices:
-      - "/dev/dri:/dev/dri"                         # Intel QSV
+    # devices:
+    #  - "/dev/dri:/dev/dri"                         # Intel QSV
     #  - "/dev/nvidia0:/dev/nvidia0"                 # Nvidia CUDA
     #  - "/dev/nvidiactl:/dev/nvidiactl"
     #  - "/dev/nvidia-modeset:/dev/nvidia-modeset"
@@ -114,13 +112,15 @@ services:
     working_dir: "/photoprism" # do not change or remove
     ## Storage Folders: "~" is a shortcut for your home directory, "." for the current directory
     volumes:
-      - "{{ photoprism_config_directory }}:/config:rw"
-      - "{{ photoprism_photos_directory }}:/photos:{{ photoprism_photos_permissions }}"
+      # "/host/folder:/photoprism/folder"                # Example
+      - "/mnt/owncloud/ava/Photos/:/photoprism/originals/ava"               # Original media files (DO NOT REMOVE)
+      - "/mnt/owncloud/arnon/Photos/:/photoprism/originals/arnon"               # Original media files (DO NOT REMOVE)
+      - "/mnt/owncloud/Shared/Photos/:/photoprism/originals/shared"               # Original media files (DO NOT REMOVE)
+      - "/mnt/owncloud/Racheli/Photos:/photoprism/originals/racheli"               # Original media files (DO NOT REMOVE)
+      # - "/example/family:/photoprism/originals/family" # *Additional* media folders can be mounted like this
       # - "~/Import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
-      - "{{ photoprism_storage }}:/photoprism/storage" # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
-      - "{{photoprism_originals}}:/originals"
-      - "{{photoprism_import}}:/import"
-      - "{{traefik_data_directory}}:/data"
+      - "./storage:/photoprism/storage"                  # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
+      - "/opt/local/prism/traefik/data:/data"
 
   ## Database Server (recommended)
   ## see https://docs.photoprism.app/getting-started/faq/#should-i-use-sqlite-mariadb-or-mysql
@@ -129,21 +129,20 @@ services:
     ## https://docs.photoprism.app/getting-started/troubleshooting/#fatal-server-errors
     restart: unless-stopped
     image: mariadb:10.8
-    container_name: "{{photoprism_db_container_name}}"
     security_opt:
       - seccomp:unconfined
       - apparmor:unconfined
     command: mysqld --innodb-buffer-pool-size=512M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
     ## Never store database files on an unreliable device such as a USB flash drive, an SD card, or a shared network folder:
     volumes:
-      - "{{photoprism_database_dir}}:/var/lib/mysql" # DO NOT REMOVE
+      - "./database:/var/lib/mysql" # DO NOT REMOVE
     environment:
       MARIADB_AUTO_UPGRADE: "1"
       MARIADB_INITDB_SKIP_TZINFO: "1"
-      MARIADB_DATABASE: "{{photoprism_database_name}}"
-      MARIADB_USER: "{{photoprism_database_user}}"
-      MARIADB_PASSWORD: "{{photoprism_password}}"
-      MARIADB_ROOT_PASSWORD: "{{photoprism_root_password}}"
+      MARIADB_DATABASE: "photoprism"
+      MARIADB_USER: "photoprism"
+      MARIADB_PASSWORD: "insecure"
+      MARIADB_ROOT_PASSWORD: "insecure"
 
   ## Watchtower upgrades services automatically (optional)
   ## see https://docs.photoprism.app/getting-started/updates/#watchtower
@@ -152,9 +151,36 @@ services:
   #   restart: unless-stopped
   #   image: containrrr/watchtower
   #   environment:
-  #     WATCHTOWER_CLEANUP: "{{photoprism_watchtower_cleanup}}"
-  #     WATCHTOWER_POLL_INTERVAL: {{photoprism_watchtower_poll}} # checks for updates every two hours
+  #     WATCHTOWER_CLEANUP: "true"
+  #     WATCHTOWER_POLL_INTERVAL: 7200 # checks for updates every two hours
   #   volumes:
   #     - "/var/run/docker.sock:/var/run/docker.sock"
-  #     - "~/.docker/config.json:/config.json" # optional, for authentication if you have a Docker Hub account
-  
+   #     - "~/.docker/config.json:/config.json" # optional, for authentication if you have a Docker Hub account
+  traefik:
+    image: traefik:v2.8
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=arnon.meshoulam@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/data/letsencrypt.json"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - "/opt/local/prism/traefik/data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  mysqladmin:
+    image: phpmyadmin
+    ports:
+      - "8085:80"
+    volumes:
+      - "./mysqladmin:/etc/phpmyadmin/config.user.inc.php"
+    environment:
+      - PMA_ARBITRARY=1
