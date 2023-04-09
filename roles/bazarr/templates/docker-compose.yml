@@ -17,7 +17,7 @@ services:
     # memory: "{{ bazarr_memory }}"
     labels:
       traefik.enable: "{{ bazarr_available_externally | string }}"
-      traefik.http.routers.bazarr.rule: "Host(`{{ ansansible_nas_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.bazarr.rule: "Host(`{{ ansible_nas_fqdn }}`)"
       traefik.http.routers.bazarr.tls.certresolver: "letsencrypt"
       traefik.http.routers.bazarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.bazarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
