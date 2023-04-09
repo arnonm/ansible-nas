@@ -12,8 +12,23 @@
         deb: "/tmp/{{deb_package}}"
         state: present
 
-    - name: Create configuration file
-      shell: /usr/bin/noip-duc  --username "{{ ddns_username }}" --password "{{ ddns_password }}" --once
+    # - name: Test configuration file
+    #   shell: /usr/bin/noip-duc  --username "{{ ddns_username }}" --password "{{ ddns_password }}" --once
+    #   become: true
+
+    - name: Create cofiguration file
+      template:
+        owner: root
+        group: root
+        src: templates/noip-duc
+        dest: /etc/noip-duc
+
+    - name: Copy service file
+      template:
+        owner: root
+        group: root
+        src: templates/duc-service
+        dest: /etc/systemd/system/noip-duc.service
 
     - name: set to run ddns on boot
       ansible.builtin.systemd:

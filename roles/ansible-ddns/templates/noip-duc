@@ -1,0 +1,4 @@
+## File: /etc/default/noip-duc
+NOIP_USERNAME={{ddns_username}}
+NOIP_PASSWORD={{ddns_password}}
+NOIP_HOSTNAMES={{ansible_nas_fqdn}}
