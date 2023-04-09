@@ -60,11 +60,13 @@ services:
         #- "traefik.http.routers.photoprism.tls=true"
       - "traefik.http.routers.photoprism.tls.certresolver=acme"
     environment:
+      PHOTOPRISM_ADMIN_USER: "admin"
       PHOTOPRISM_ADMIN_PASSWORD: "Mashov123"         # YOUR INITIAL ADMIN PASSWORD (MINIMUM 8 CHARACTERS, USERNAME "admin")
       PHOTOPRISM_SITE_URL: "/photoprism"             # public server URL incl http:// or https:// and /path, :port is optional
       PHOTOPRISM_ORIGINALS_LIMIT: 5000               # file size limit for originals in MB (increase for high-res video)
       PHOTOPRISM_HTTP_COMPRESSION: "gzip"            # improves transfer speed and bandwidth utilization (none or gzip)
       PHOTOPRISM_LOG_LEVEL: "error"                  # log level: trace, debug, info, warning, error, fatal, or panic
+      PHOTOPRISM_DEBUG: "false"
       #PHOTOPRISM_PUBLIC: "true"                     # no authentication required (disables password protection)
       PHOTOPRISM_AUTH_MODE: "password"
       PHOTOPRISM_READONLY: "false"                   # do not modify originals directory (reduced functionality)
