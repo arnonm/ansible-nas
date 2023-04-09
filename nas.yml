@@ -30,12 +30,6 @@
         - ansible-ddns
       when: (ansible_ddns_enabled | default(False))
 
-    - role: ansible-role-snapraid
-      tags:
-        - ansible-snapraid
-        - skip_ansible_lint
-      when: (snapraid_enabled | default(False))
-
     - role: bertvv.samba
       tags:
         - samba
@@ -57,6 +51,12 @@
       tags:
         - ansible-nas-docker
         - ansible-nas
+
+    - role: ansible-role-snapraid
+      tags:
+        - ansible-snapraid
+        - skip_ansible_lint
+      when: (snapraid_enabled | default(False))
 
     - role: route53_ddns
       tags:
@@ -129,6 +129,7 @@
         - cockpit
       when: (cockpit_enabled | default(False))
 
+    # Must run after linux-system-roles.cockpit and after samba installation
     - role: ansible-cockpit
       tags:
         - cockpit
@@ -380,7 +381,6 @@
       tags:
         - plex
       when: (plex_enabled | default(False))
-
     - role: photoprism
       tags:
         - photoprism
