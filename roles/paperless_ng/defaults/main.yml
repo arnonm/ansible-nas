@@ -31,8 +31,9 @@ paperless_ng_user_id: "1000"
 paperless_ng_group_id: "1000"
 
 # settings
-paperless_ng_languages: "deu eng"
-
+paperless_ng_languages: "heb eng"
+paperless_ng_language: "eng+heb"
+paperless_ng_file_format: "{created_year}/{created_month}/{tag_list}_{title}"
 # specs
 paperless_ng_ui_memory: 1g
 paperless_ng_postgres_memory: 1g
