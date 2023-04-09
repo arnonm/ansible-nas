@@ -19,6 +19,7 @@ ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5MmEhwd7q59uGEyeX2VajxXdU/M
 samba_enabled: true
 samba_shares_root: /mnt/storage/samba # We don't want it in Mount - we want it in the pools
 samba_server_string: "DSM NAS"
+samba_force_group: "samba-users"
 samba_users:
   - name: arnon
     password: "{{ default_user_password}}"
@@ -40,6 +41,7 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ downloads_root }}"
+    group: "{{samba_force_group}}"
 
   - name: movies
     comment: "Movies"
@@ -48,6 +50,7 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ movies_root }}"
+    group: "{{samba_force_group}}"
 
   - name: tv
     comment: "TV Episodes"
@@ -56,6 +59,7 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ tv_root }}"
+    group: "{{samba_force_group}}"
 
   - name: music
     comment: "Music"
@@ -64,6 +68,7 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ music_root }}"
+    group: "{{samba_force_group}}"
 
   - name: dump
     comment: "File dump"
@@ -72,6 +77,7 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ samba_shares_root }}/dump"
+    group: "{{samba_force_group}}"
 
   - name: photos
     comment: "Pictures"
@@ -80,22 +86,25 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ photos_root }}"
+    group: "{{samba_force_group}}"
 
   - name: documents
     comment: "Documents"
-    guest_ok: yes
+    guest_ok: no
     public: yes
     writable: yes
     browseable: yes
     path: "{{ documents_root }}"
+    group: "{{samba_force_group}}"
+    valid_users: "@{{samba_force_group}}"
 
-  - name: code
-    comment: "Code"
-    guest_ok: yes
-    public: yes
-    writable: yes
-    browseable: yes
-    path: "{{ code_root }}"
+  # - name: code
+  #   comment: "Code"
+  #   guest_ok: yes
+  #   public: yes
+  #   writable: yes
+  #   browseable: yes
+  #   path: "{{ code_root }}"
 
 nfs_shares_root:
 nfs_exports:
@@ -154,7 +163,7 @@ portainer_data_directory: "{{ compose_home }}/portainer/data"
 
 photoprism_enabled: true
 photoprism_available_externally: true
-photoprism_compose_directory: "{{ compose_home }}/prism/config"
+photoprism_compose_directory: "{{ compose_home }}/prism"
 photoprism_storage: "{{ compose_home }}/prism/storage"
 photoprism_database_dir: "{{ compose_home }}/prism/db"
 photoprism_photos_directory: "{{ photos_root }}"
@@ -177,17 +186,17 @@ homer_compose_directory: "{{ compose_home }}/homer"
 
 
 deluge_enabled: true
-eluge_config_directory: "{{ compose_home }}/deluge/config"
+deluge_config_directory: "{{ compose_home }}/deluge/config"
 deluge_download_directory: "{{ downloads_root }}"
 deluge_watch_directory: "{{ torrents_root }}"
-deluge_user_id: 1312
-deluge_group_id: 1312
+deluge_user_id: "1312"
+deluge_group_id: "1312"
 
 radarr_enabled: true
 radarr_download_directory: "{{ downloads_root }}"
 radarr_data_directory: "{{ compose_home }}/radarr/data"
-radarr_user_id: 1313
-radarr_group_id: 1313
+radarr_user_id: "1313"
+radarr_group_id: "1313"
 
 
 jackett_enabled: true
@@ -197,8 +206,8 @@ jackett_torrents_root: "{{ torrents_root }}"
 sonarr_enabled: true
 sonarr_data_directory: "{{ compose_home }}/sonarr/data"
 sonarr_download_directory: "{{ downloads_root }}"
-sonarr_user_id: 1314
-sonarr_group_id: 1314
+sonarr_user_id: "1314"
+sonarr_group_id: "1314"
 
 plex_enabled: true
 plex_config_directory: "{{ compose_home }}/plex/config"
@@ -211,7 +220,7 @@ plex_photos_directory: "{{ photos_root }}"
 plex_podcasts_directory: "{{ podcasts_root }}"
 plex_music_directory: "{{ music_root }}"
 plex_audiobooks_directory: "{{ audiobooks_root }}"
-plex_compose_directory: "{{ compose_home }}/plex/config"
+plex_compose_directory: "{{ compose_home }}/plex"
 plex_user_id: "1309"
 plex_group_id: "1309"
 plex_devices:
@@ -224,7 +233,8 @@ route53_data_directory: "{{ compose_home }}/route53_ddns"
 snapraid_enabled: true
 snapraid_install: true
 snapraid_runner: true
-snapraid_check: false
+snapraid_check: true
+
 
 snapraid_content_files:
   - /var/snapraid.content
@@ -249,19 +259,26 @@ disk_additional_disks:
   - disk: /dev/sdb
     fstype: ext4
     mount_options: defaults
+    mount: /opt/local
+    user: root
+    group: root
+    mode: "0755"
+  - disk: /dev/sdc
+    fstype: ext4
+    mount_options: defaults
     mount: /mnt/parity1
     user: root
     group: root
     mode: "0755"
     #  disable_periodic_fsck: false
-  - disk: /dev/sdc
+  - disk: /dev/sdd
     fstype: ext4
     mount_options: defaults
     mount: /mnt/disk1
     user: root
     group: root
     mode: "0755"
-  - disk: /dev/sdd
+  - disk: /dev/sde
     fstype: ext4
     mount_options: defaults
     mount: /mnt/disk2
@@ -286,6 +303,8 @@ google_domain_ddns: "ddns-domain.test"
 
 timemachine_enabled: true
 timemachine_data_directory: "{{samba_shares_root}}/timemachine"
+timemachine_group_id: "1312"
+timemachine_user_id: "1312"
 
 webmin_enabled: false
 webmin_base_dir: "/usr/share/webmin"
@@ -293,3 +312,18 @@ webmin_base_dir: "/usr/share/webmin"
 letsencrypt_enabled: true
 
 cloudberry_enabled: true
+
+paperless_ng_enabled: false
+paperless_ng_config_directory: "{{ compose_home }}/paperless_ng"
+paperless_ng_files_directory: "{{ documents_root }}/paperless"
+
+paperless_ng_postgres_directory: "{{ paperless_ng_config_directory }}/postgres"
+paperless_ng_data_directory: "{{ paperless_ng_config_directory }}/data"
+paperless_ng_export_directory: "{{ paperless_ng_config_directory }}/export"
+paperless_ng_media_directory: "{{ paperless_ng_files_directory }}/media"
+paperless_ng_consume_directory: "{{ paperless_ng_files_directory }}/consume"
+paperless_ng_port: "16922"
+paperless_ng_hostname: "{{ansible_nas_fqdn}}"
+paperless_ng_user_id: 1315
+paperless_ng_group_id: 1315
+
