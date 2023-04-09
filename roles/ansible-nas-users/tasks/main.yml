@@ -41,6 +41,7 @@
   user:
     name: root
     password: "{{ root_passwd | password_hash('sha512') }}"
+    state: present 
 
 - name: Create/Update regular user_passwd
   user:
@@ -52,3 +53,20 @@
     append: false
     shell: /bin/bash
   loop: "{{ regular_users }}"
+
+- name: Create {{samba_force_group}} group
+  block:
+    - name: Create Group
+      group:
+        name: "{{samba_force_group}}"
+        state: present
+
+    - name: Create/Update regular user_passwd
+      user:
+        name: "{{ item.name }}"
+        groups: "{{samba_force_group}}"
+        state: present
+        append: true
+      loop: "{{ regular_users }}"
+  
+  when: samba_enabled
