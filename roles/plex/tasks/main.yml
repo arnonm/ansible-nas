@@ -27,6 +27,7 @@
       with_items:
         - "{{ plex_config_directory }}"
         - "{{ plex_logs }}"
+        - "{{plex_data_directory}}"
 
     - name: Template over docker-compose.yml file
       template:

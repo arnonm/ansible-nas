@@ -17,6 +17,7 @@ plex_compose_directory: "{{docker_home}}/plex/config"
 # uid / gid
 plex_user_id: "1309"
 plex_group_id: "1309"
+plex_claim: "{{mandatory}}"
 
 # If you're paranoid, set permissions to "ro" so Plex won't ever be able to
 # delete your files
