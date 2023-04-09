@@ -24,7 +24,7 @@
 - name: Gathering service facts
   service_facts:
 
-- name: stop nginx if it is running  
+- name: stop nginx if it is running
   service: 
     name: nginx
     state: stopped
@@ -37,19 +37,19 @@
   ignore_errors: true 
 
 - name: Request certificate
-  shell: "{{certbot_path }} certonly --standalone --domains {{ domain_name }} --email {{ acme_email }} --agree-tos -n"
+  shell: "{{certbot_path }} certonly --standalone --domains {{ ansible_nas_fqdn }} --email {{ acme_email }} --agree-tos -n"
   become: true
 
-- name: Verify certificates
-  shell: '{{certbot_path}}  certificates | grep "Certificate Name: {{domain_name}} " '
-  become: true
+# - name: Verify certificates
+#   shell: {{certbot_path}}  certificates | grep "Certificate Name: {{ansible_nas_fqdn}}"
+#   become: true
 
 - name: Add scripts to renew certificates
   block:
     - name: Service template
       template:
         src: templates/certbot.service
-        dest: /etc/snapraid.conf/etc/systemd/system/certbot.service
+        dest: /etc/systemd/system/certbot.service
         owner: root
         group: root
         mode: 0775
@@ -57,7 +57,7 @@
     - name: Time template
       template:
         src: templates/certbot.timer
-        dest: /etc/snapraid.conf/etc/systemd/system/certbot.timer
+        dest: /etc/systemd/system/certbot.timer
         owner: root
         group: root
         mode: 0775
