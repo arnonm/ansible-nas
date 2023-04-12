@@ -1,37 +1,67 @@
 ---
-- name: Include OS-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
-  tags:
-    - mergerfs
-
 - name: Install mergerfs
   block:
-    - name: Install mergerfs prerequisites
-      become: true
-      package:
-        name: "{{ mergerfs_prerequisites }}"
-        state: present
-        update_cache: true
-      tags:
-        - mergerfs
-        - mergerfs_install
+  - name: Include OS-specific variables
+    include_vars: "{{ ansible_os_family }}.yml"
+    tags:
+      - mergerfs
 
-    - name: Include install tasks from {{mergerfs_install_mode s}}
-      import_tasks: install_from_{{ mergerfs_install_mode }}.yml
-      tags:
-        - mergerfs
-        - mergerfs_install
+  - name: Install mergerfs prerequisites
+    become: true
+    package:
+      name: "{{ mergerfs_prerequisites }}"
+      state: present
+      update_cache: true
+    tags:
+      - mergerfs
+      - mergerfs_install
 
-    - name: Mount mergerfs filesystems
-      become: true
-      mount:
-        fstype: fuse.mergerfs
-        src: "{{ ':'.join(item.branches | mandatory) }}"
-        path: "{{ item.path | mandatory }}"
-        opts: "{{ item.options | default('defaults') }}"
-        state: "{{ item.state | default('mounted') }}"
-      loop: "{{ mergerfs_mounts }}"
-      tags:
-        - mergerfs
-        - mergerfs_mount
+  # Check if mounted and unmount if mounted
+  - name: stop Samba service(s)
+    service:
+      name: "{{ item }}"
+      state: stopped
+      enabled: true
+    with_items: 
+    - smbd
+    - nmbd
+    when: samba_enabled is true
+
+  - name: Unmount mergerfs to update version if source files source_files changed 
+    ansible.posix.mount:
+      path: "{{mergerfs_mounts[0]['path'] | mandatory}}"
+      state: unmounted
+        # when: source_files.changed
+
+
+  - name: Include install tasks from {{mergerfs_install_mode s}}
+    import_tasks: install_from_{{ mergerfs_install_mode }}.yml
+    tags:
+      - mergerfs
+      - mergerfs_install
+
+  - name: Mount mergerfs filesystems
+    become: true
+    mount:
+      fstype: fuse.mergerfs
+      src: "{{ ':'.join(item.branches | mandatory) }}"
+      path: "{{ item.path | mandatory }}"
+      opts: "{{ item.options | default('defaults') }}"
+      state: "{{ item.state | default('mounted') }}"
+    loop: "{{ mergerfs_mounts }}"
+    tags:
+      - mergerfs
+      - mergerfs_mount
+
+  - name: Install mergerfs tools 
+    block:
+      - name: get mergerfs tools library
+        ansible.builtin.copy:
+          src: "{{mergerfs_tools_url}}/{{item}}"
+          dest: "{{mergerfs_tools_dir}}/{{item}}"
+          remote_src: true
+          user: root 
+          group: root 
+        loop: "{{mergerfs_tools}}"
+    when: mergerfs_tools_enable is true 
   when: mergerfs_enabled is true and not ansible_check_mode
