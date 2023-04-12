@@ -52,6 +52,7 @@
     dest: "{{samba_conf_file}}"
     user: root
     group: root
+    validate: 'testparm -s %s'
   when: conf_exists and global_present
 
 # Need to deal with the samba registry
