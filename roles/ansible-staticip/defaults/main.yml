@@ -1,0 +1,7 @@
+net_interfaces: [ 'enp3s0' ] 
+name_server: "172.16.20.1"
+dhcp_hostname: {{mandatory}}
+static_address: {{mandatory}}
+static_map:  {{ mandatory }}
+nameservers: [ 
+  domain: address ]
