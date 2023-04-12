@@ -16,6 +16,7 @@
           update_password: on_create
           create_home: no
           group: sonarr
+          groups: "{{samba_force_group}}"
 
       - name: Create Sonarr Directories
         file:
@@ -28,8 +29,8 @@
         template:
           src: templates/docker-compose.yml
           dest: "{{sonarr_compose_directory}}/docker-compose.yml"
-          owner: prism
-          group: prism
+          owner: sonarr
+          group: sonarr
 
       # - name: Stop existing photoprism
       #   docker_compose:
