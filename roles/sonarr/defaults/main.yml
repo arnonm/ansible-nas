@@ -6,14 +6,16 @@ sonarr_available_externally: false
 sonarr_data_directory: "{{ docker_home }}/sonarr/config"
 sonarr_tv_directory: "{{ tv_root }}"
 sonarr_download_directory: "{{ downloads_root }}"
+sonarr_compose_directory: "{{ compose_home }}/sonarr"
 
 # uid / gid
-sonarr_user_id: "0"
-sonarr_group_id: "0"
+sonarr_user_id: "{{mandatory}}"
+sonarr_group_id: "{{mandatory}}"
 
 # network
 sonarr_port: "8989"
 sonarr_hostname: "sonarr"
+sonarr_container_name: "sonarr"
 
 # specs
 sonarr_memory: 1g
