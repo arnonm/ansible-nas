@@ -1,0 +1,25 @@
+version: '3.5'
+
+services:
+    radarr:
+      container_name: "{{radarr_container_name}}"
+      image: linuxserver/radarr
+      volumes:
+        - "{{ radarr_movies_directory }}:/movies:rw"
+        - "{{ radarr_download_directory }}:/downloads:rw"
+        - "{{ radarr_data_directory }}:/config:rw"
+      ports:
+        - "{{ radarr_port }}:{{radarr_port}}"
+      environment:
+        TZ: "{{ ansible_nas_timezone }}"
+        PUID: "{{ radarr_user_id }}"
+        PGID: "{{ radarr_group_id }}"
+      restart: unless-stopped
+      # memory: "{{ radarr_memory }}"
+      # labels:
+        # traefik.enable: "{{ sonarr_available_externally | string }}"
+        # traefik.http.routers.sonarr.rule: "Host(`{{ sonarr_hostname }}.{{ ansible_nas_domain }}`)"
+        # traefik.http.routers.sonarr.tls.certresolver: "letsencrypt"
+        # traefik.http.routers.sonarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+        # traefik.http.routers.sonarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+        # traefik.http.services.sonarr.loadbalancer.server.port: "8989"
