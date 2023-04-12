@@ -23,4 +23,4 @@ ansible_nas_extra_packages:
 # You can find a list here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 ansible_nas_timezone: Etc/UTC
 
-samba_force_group: {{mandatory}}
+samba_force_group: "{{mandatory}}"

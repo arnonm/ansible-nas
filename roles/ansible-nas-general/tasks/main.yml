@@ -41,7 +41,7 @@
     path: "{{ item.path }}"
     state: directory
     owner: ansible-nas
-    group: {{ samba_force_group }}
+    group: "{{ samba_force_group }}"
     mode: "u=rwX,g=rwX,o=rX"
     recurse: false
   loop: "{{ samba_shares }}"
