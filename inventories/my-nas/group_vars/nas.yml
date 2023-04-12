@@ -128,6 +128,7 @@ cockpit_packages: full
 ### Mergefs
 ###
 mergerfs_enabled: true
+mergerfs_tools_enable: true
 # mergerfs_install_mode: package_manager
 mergerfs_install_mode: "source"
 mergerfs_minfreespace: "2G"
@@ -285,6 +286,13 @@ disk_additional_disks:
     user: root
     group: root
     mode: "0755"
+  - disk: /dev/sdf
+    fstype: ext4
+    mount_options: defaults
+    mount: /mnt/disk3
+    user: root
+    group: root
+    mode: "0755"
 disk_enable_partioning: false
 
 ansible_ddns_enabled: true
@@ -313,7 +321,7 @@ letsencrypt_enabled: true
 
 cloudberry_enabled: true
 
-paperless_ng_enabled: false
+paperless_ng_enabled: true
 paperless_ng_config_directory: "{{ compose_home }}/paperless_ng"
 paperless_ng_files_directory: "{{ documents_root }}/paperless"
 
