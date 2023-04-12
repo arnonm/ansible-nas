@@ -46,7 +46,7 @@ services:
     ## Don't enable automatic restarts until PhotoPrism has been properly configured and tested!
     ## If the service gets stuck in a restart loop, this points to a memory, filesystem, network, or database issue:
     ## https://docs.photoprism.app/getting-started/troubleshooting/#fatal-server-errors
-    # restart: unless-stopped
+    restart: unless-stopped
     security_opt:
       - seccomp:unconfined
       - apparmor:unconfined
@@ -58,7 +58,7 @@ services:
       - "traefik.http.routers.photoprism.rule=Host(`{{ansible_nas_fqdn}}`) && PathPrefix(`{{photoprism_path}}`)"
       - "traefik.http.routers.photoprism.entrypoints=web,websecure"
         #- "traefik.http.routers.photoprism.tls=true"
-      - "traefik.http.routers.photoprism.tls.certresolver=acme"
+      - "traefik.http.routers.photoprism.tls.certresolver=myresolver"
     environment:
       PHOTOPRISM_ADMIN_USER: "admin"
       PHOTOPRISM_ADMIN_PASSWORD: "Mashov123"         # YOUR INITIAL ADMIN PASSWORD (MINIMUM 8 CHARACTERS, USERNAME "admin")
@@ -82,7 +82,6 @@ services:
       PHOTOPRISM_JPEG_QUALITY: 85                    # image quality, a higher value reduces compression (25-100)
       PHOTOPRISM_DETECT_NSFW: "false"                # flag photos as private that MAY be offensive (requires TensorFlow)
       PHOTOPRISM_UPLOAD_NSFW: "true"                 # allows uploads that MAY be offensive
-      # PHOTOPRISM_DATABASE_DRIVER: "sqlite"         # SQLite is an embedded database that doesn't require a server
       PHOTOPRISM_DATABASE_DRIVER: "mysql"            # use MariaDB 10.5+ or MySQL 8+ instead of SQLite for improved performance
       PHOTOPRISM_DATABASE_SERVER: "mariadb:3306"     # MariaDB or MySQL database server (hostname:port)
       PHOTOPRISM_DATABASE_NAME: "{{photoprism_database_name}}"         # MariaDB or MySQL database schema name
@@ -117,8 +116,7 @@ services:
     ## Storage Folders: "~" is a shortcut for your home directory, "." for the current directory
     volumes:
       - "{{ photoprism_config_directory }}:/config:rw"
-      - "{{ photoprism_photos_directory }}:/photos:{{ photoprism_photos_permissions }}"
-      # - "~/Import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
+      - "{{ photoprism_photos_directory }}:/photoprism/originals:{{ photoprism_photos_permissions }}"
       - "{{ photoprism_storage }}:/photoprism/storage" # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
       - "{{photoprism_originals}}:/originals"
       - "{{photoprism_import}}:/import"
