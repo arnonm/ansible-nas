@@ -55,6 +55,11 @@
 
   - name: Install mergerfs tools 
     block:
+      - name: install rsync - required
+        apt:
+          name: "rsync"
+          state: present
+
       - name: get mergerfs tools library
         ansible.builtin.copy:
           src: "{{mergerfs_tools_url}}/{{item}}"
