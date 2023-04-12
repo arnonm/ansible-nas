@@ -6,7 +6,7 @@ photoprism_available_externally: false
 photoprism_config_directory: "{{ docker_home }}/prism/config"
 photoprism_storage: "{{ docker_home }}/prism/storage"
 photoprism_photos_directory: "{{ samba_shares_root }}/photos"
-photoprism_compose_directory: "{{ docker_home }}/prism/config"
+photoprism_compose_directory: "{{ docker_home }}/prism"
 photoprism_originals: "{{ docker_home }}/prism/originals"
 photoprism_import: "{{ docker_home }}/prism/import"
 
@@ -27,7 +27,7 @@ photoprism_memory: "2g"
 # Device mappings for the docker container. E.g. To enable hardware transcoding:
 # photoprism_devices:
 #  - "/dev/dri:/dev/dri"
-photoprism_port: 2345
+photoprism_port: 2342
 photoprism_database_dir: "{{ mandatory }}"
 photoprism_database_name: "photoprism"
 photoprism_database_user: "photoprism"
