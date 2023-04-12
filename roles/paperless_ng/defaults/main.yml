@@ -8,7 +8,7 @@ paperless_ng_files_directory: "{{ documents_root }}/paperless"
 paperless_ng_postgres_directory: "{{ paperless_ng_config_directory }}/postgres"
 paperless_ng_data_directory: "{{ paperless_ng_config_directory }}/data"
 paperless_ng_export_directory: "{{ paperless_ng_config_directory }}/export"
-paperless_ng_media_directory: "{{ paperless_ng_files_directory }}/media"
+paperless_ng_media_directory: "{{ samba_shares_root }}/paperless/media"
 paperless_ng_consume_directory: "{{ paperless_ng_files_directory }}/consume"
 
 # network
@@ -31,7 +31,7 @@ paperless_ng_user_id: "1000"
 paperless_ng_group_id: "1000"
 
 # settings
-paperless_ng_languages: "heb eng"
+paperless_ng_languages: "  eng"
 paperless_ng_language: "eng+heb"
 paperless_ng_file_format: "{created_year}/{created_month}/{tag_list}_{title}"
 # specs
