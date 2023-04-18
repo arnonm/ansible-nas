@@ -3,20 +3,27 @@ deluge_enabled: false
 deluge_available_externally: false
 
 # directories
-deluge_config_directory: "{{ docker_home }}/deluge/config"
-deluge_download_directory: "{{ downloads_root }}"
-deluge_watch_directory: "{{ torrents_root }}"
+service_config_directory: "{{ docker_home }}/deluge/config"
+service_download_directory: "{{ downloads_root }}"
+service_watch_directory: "{{ torrents_root }}"
 
 # uid / gid
-deluge_user_id: "{{mandatory}}"
-deluge_group_id: "{{ mandatory }}"
+service_user_id: "{{deluge_user_id}}"
+service_group_id: "{{ deluge_group_id }}"
+service_group_name: "samba-users"
+service_user_name: "deluge"
 
 # error logging
-deluge_log_level: "error"
+service_log_level: {{ deluge_log_level || "error"}}
 
 # network
 deluge_port: "8112"
+service_port: "{{deluge_port}}"
 deluge_hostname: "deluge"
+
+service_container_name: "deluge"
+service_name: "deluge"
+service_image_name: "lscr.io/linuxserver/deluge:latest"
 
 deluge_timezone: "{{ ansible_nas_timezone }}"
 
