@@ -1,0 +1,30 @@
+---
+- name: check for letsencrypt
+  stat: 
+    path: "{{letsencrypt_dir}}/live/{{ansible_nas_fqdn}}/fullchain.pem"
+  register: cert_exists 
+
+- name: check for letsencrypt
+  stat: 
+    path: "{{letsencrypt_dir}}/live/{{ansible_nas_fqdn}}/privkey.pem"
+  register: key_exists 
+
+- name: copy certificates
+  block:
+  - template:
+    src: "templates/restart-cockpit.sh"
+    dest: "/etc/letsencrypt/renewal-hooks/post/001-restart-cockpit.sh"
+
+  - ansible.builtin.command:
+    cmd: "/etc/letsencrypt/renewal-hooks/post/001-restart-cockpit.sh"
+    chdir: "/etc/letsencrypt/renewal-hooks/post"
+    
+  - ansible.builtin.file:
+    path: "/etc/cockpit/ws-certs.d/0-self-signed.cert"
+    state: absent 
+
+  - ansible.builtin.file:
+    path: "/etc/cockpit/ws-certs.d/0-self-signed.key"
+    state: absent 
+  
+  when: key_exists.exists and cert_exists.exists and letsencrypt_enabled

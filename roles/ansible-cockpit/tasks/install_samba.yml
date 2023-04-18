@@ -1,5 +1,5 @@
 ---
-- name: Add Samba addon 
+- name: Add 45drives repo 
   ansible.builtin.command:
     chdir: /tmp
     cmd:  "curl -sSL https://repo.45drives.com/setup | bash"

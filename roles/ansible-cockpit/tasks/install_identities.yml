@@ -1,0 +1,20 @@
+---
+- name: Add 45drives repo 
+  ansible.builtin.command:
+    chdir: /tmp
+    cmd:  "curl -sSL https://repo.45drives.com/setup | bash"
+  become: true
+
+- name: Update apt-cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+    register: result
+  until: result is succeeded
+    
+- name: Install some packages
+  apt:
+    name: "cockpit-identities"
+    state: present
+  register: result
+  until: result is succeeded

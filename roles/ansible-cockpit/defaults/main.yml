@@ -2,3 +2,4 @@
 cockpit_docker_github_releases_url: "https://github.com/mrevjd/cockpit-docker/releases"
 cockpit_docker_version: "latest"
 samba_conf_file: "/etc/samba/smb.conf"
+cockpit_identities_enabled: false
