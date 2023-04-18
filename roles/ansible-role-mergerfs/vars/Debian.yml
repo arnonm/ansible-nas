@@ -1,6 +1,8 @@
 ---
 mergerfs_prerequisites:
   - fuse
+  - rsync
+  - xattr
 mergerfs_dist: "{{ ansible_distribution|lower }}-{{ ansible_distribution_release }}"
 mergerfs_arch_map:
   x86_64: amd64
