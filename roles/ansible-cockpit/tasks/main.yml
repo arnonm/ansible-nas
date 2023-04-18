@@ -45,7 +45,11 @@
     - name: Install identities module
       include_tasks: install_identities.yml
       when: cockpit_identities_enabled
-      
+
+    - name: Add certificates when letsencrypt is enabled
+      include_tasks: manage_certificates.yml 
+      when: letsencrypt_enabled
+
     - name: Install 
     - name: Restart Cockpit
       service:
