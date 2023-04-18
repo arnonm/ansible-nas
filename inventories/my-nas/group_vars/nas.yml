@@ -123,6 +123,7 @@ cockpit_enabled: true
 cockpit_started: true
 cockpit_port: 9090
 cockpit_packages: full
+cockpit_identities_enabled: true
 
 ###
 ### Mergefs
@@ -235,7 +236,10 @@ snapraid_enabled: true
 snapraid_install: true
 snapraid_runner: true
 snapraid_check: true
-
+snapraid_config_hidden_files_enabled: true
+snapraid_config_hidden_files: nohidden
+snapraid_config_excludes:
+  - "exclude /lost+found/"
 
 snapraid_content_files:
   - /var/snapraid.content
@@ -266,7 +270,7 @@ disk_additional_disks:
     mode: "0755"
   - disk: /dev/sdc
     fstype: ext4
-    mount_options: defaults
+    mount_options: defaults,nobootwait,errors=remount-ro
     mount: /mnt/parity1
     user: root
     group: root
@@ -274,21 +278,21 @@ disk_additional_disks:
     #  disable_periodic_fsck: false
   - disk: /dev/sdd
     fstype: ext4
-    mount_options: defaults
+    mount_options: defaults,nobootwait,errors=remount-ro
     mount: /mnt/disk1
     user: root
     group: root
     mode: "0755"
   - disk: /dev/sde
     fstype: ext4
-    mount_options: defaults
+    mount_options: defaults,nobootwait,errors=remount-ro
     mount: /mnt/disk2
     user: root
     group: root
     mode: "0755"
   - disk: /dev/sdf
     fstype: ext4
-    mount_options: defaults
+    mount_options: defaults,nobootwait,errors=remount-ro
     mount: /mnt/disk3
     user: root
     group: root
@@ -318,6 +322,7 @@ webmin_enabled: false
 webmin_base_dir: "/usr/share/webmin"
 
 letsencrypt_enabled: true
+letsencrypt_dir: "/etc/letsencrypt/keys"
 
 cloudberry_enabled: true
 
