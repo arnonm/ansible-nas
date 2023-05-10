@@ -14,7 +14,7 @@ service_group_name: "samba-users"
 service_user_name: "deluge"
 
 # error logging
-service_log_level: {{ deluge_log_level || "error"}}
+service_log_level: "{{ deluge_log_level || string('error') }}"
 
 # network
 deluge_port: "8112"

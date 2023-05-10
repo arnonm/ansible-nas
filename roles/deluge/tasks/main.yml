@@ -27,28 +27,27 @@
         - "{{ service_config_directory }}"
         - "{{ service_download_directory }}"
 
-
-  - name: Template over docker-compose.yml file
-    template:
+    - name: Template over docker-compose.yml file
+      template:
         src: "templates/docker-compose.yml"
         dest: "{{service_config_directory}}/docker-compose.yml"
         owner: paperless
         group: paperless
 
-  - name: Stop existing service
-    docker_compose:
+    - name: Stop existing service
+      docker_compose:
         build: no
         stopped: yes
         project_src: "{{ service_config_directory }}"
 
-  - name: Build service
-    docker_compose:
-        state: present
-        build: yes
-        project_src: "{{ service_config_directory }}"
+    - name: Build service
+      docker_compose:
+          state: present
+          build: yes
+          project_src: "{{ service_config_directory }}"
 
-  - name: Start service
-    docker_compose:
+    - name: Start service
+      docker_compose:
         build: no
         project_src: "{{ service_config_directory }}"
   
