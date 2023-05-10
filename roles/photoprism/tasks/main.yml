@@ -28,11 +28,20 @@
           - "{{ photoprism_config_directory }}"
           - "{{ photoprism_compose_directory }}"
           - "{{ photoprism_storage }}"
+          - "{{ photoprism_import }}"
+          - "{{ photoprism_letsencrypt }}"
           
       - name: Template over docker-compose.yml file
         template:
           src: templates/docker-compose.yml
           dest: "{{photoprism_compose_directory}}/docker-compose.yml"
+          owner: prism
+          group: prism
+
+      - name: Template over acme.json
+        template:
+          src: templates/acme.json
+          dest: "{{photoprism_letsencrypt}}/acme.json"
           owner: prism
           group: prism
 
@@ -52,6 +61,20 @@
         docker_compose:
           build: no
           project_src: "{{ photoprism_compose_directory }}"
+
+      - name: Add superuser to Photoprism
+        docker_compose:
+          build: no 
+          project_src: "{{ photoprism_compose_directory }}"
+          exec: "photoprism users add --name {{primary_user}} --password {{primary_user_passwd}} -w -s {{primary_user}} "
+
+      - name: Add users to Photoprism
+        docker_compose:
+          build: no 
+          project_src: "{{ photoprism_compose_directory }}"
+          exec: "photoprism users add --name {{item.comment}} --email {{item.email}} --password {{item.password}} -w {{item.name}} "
+        loop: "{{ regular_users }}"
+
     when: photoprism_enabled is true
 
   - name: Stop Photoprism

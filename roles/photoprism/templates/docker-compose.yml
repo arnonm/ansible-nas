@@ -37,7 +37,7 @@ version: '3.5'
 # This will point the home directory shortcut ~ to /root in volume mounts.
 
 services:
-  photoprism:
+  "{{photoprism_container_name}}":
     ## Use photoprism/photoprism:preview for testing preview builds:
     image: "photoprism/photoprism:latest"
     container_name: "{{photoprism_container_name}}"
@@ -52,12 +52,12 @@ services:
       - apparmor:unconfined
     ports:
       - "{{photoprism_port}}:2342" # HTTP port (host:container)
-    user:  "{{photoprism_user_id}}:100"
+    user:  "{{photoprism_user_id}}:1007"
     labels:
       - "traefik.enable = {{ photoprism_available_externally | string }}"
       - "traefik.http.routers.photoprism.rule=Host(`{{ansible_nas_fqdn}}`) && PathPrefix(`{{photoprism_path}}`)"
       - "traefik.http.routers.photoprism.entrypoints=web,websecure"
-        #- "traefik.http.routers.photoprism.tls=true"
+      - "traefik.http.routers.photoprism.tls=true"
       - "traefik.http.routers.photoprism.tls.certresolver=myresolver"
     environment:
       PHOTOPRISM_ADMIN_USER: "admin"
@@ -96,8 +96,8 @@ services:
       # PHOTOPRISM_FFMPEG_ENCODER: "software"        # FFmpeg encoder ("software", "intel", "nvidia", "apple", "raspberry")
       # PHOTOPRISM_FFMPEG_BITRATE: "32"              # FFmpeg encoding bitrate limit in Mbit/s (default: 50)
       ## Switch to a non-root user after initialization (supported IDs are 33, 50-99, 500-600, and 900-1200):
-      #PHOTOPRISM_UID: "{{ photoprism_user_id | default(omit) }}"
-      #PHOTOPRISM_GID: "{{ photoprism_group_id | default(omit) }}"
+      PHOTOPRISM_UID: "{{ photoprism_user_id | default(omit) }}"
+      PHOTOPRISM_GID: "{{ photoprism_group_id | default(omit) }}"
       TZ: "{{ ansible_nas_timezone }}"
       # PHOTOPRISM_UMASK: 0000
     ## Start as a non-root user before initialization (supported IDs are 33, 50-99, 500-600, and 900-1200):
@@ -118,7 +118,7 @@ services:
       - "{{ photoprism_config_directory }}:/config:rw"
       - "{{ photoprism_photos_directory }}:/photoprism/originals:{{ photoprism_photos_permissions }}"
       - "{{ photoprism_storage }}:/photoprism/storage" # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
-      - "{{photoprism_originals}}:/originals"
+      #- "{{photoprism_originals}}:/originals"
       - "{{photoprism_import}}:/import"
       - "{{traefik_data_directory}}:/data"
 
@@ -158,3 +158,47 @@ services:
   #     - "/var/run/docker.sock:/var/run/docker.sock"
   #     - "~/.docker/config.json:/config.json" # optional, for authentication if you have a Docker Hub account
   
+
+  traefik:
+    image: "traefik:v2.9"
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.myresolver.acme.email={{cert_email}}"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+        #- "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+        #- "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+        #- "--providers.docker.watch=true"
+      #Uncomment to generate a new certificate
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+    ports:
+      - "80:80"
+      - "443:443"
+        #- "8080:8080"
+    volumes:
+      #- "/opt/local/traefik/data/letsencrypt:/letsencrypt"
+      - "{{photoprism_letsencrypt}}:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      # Dashboard
+      #- "traefik.http.routers.traefik.rule=Host(`dsmhome.ddns.net`)"
+      #- "traefik.http.routers.traefik.service=api@internal"
+      #- "traefik.http.routers.traefik.tls=true"
+      #- "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      #- "traefik.http.routers.traefik.entrypoints=websecure"
+      #- "traefik.http.routers.traefik.middlewares=authtraefik"
+      #- "traefik.http.middlewares.authtraefik.basicauth.users=devAdmin:$$2y$$05$$h9OxLeY20/5uiXjfPgdRxuFlrfqBf2QifYDgrwsR6rAEgX3/dpOGq" # user:devAdmin, password:devto
+      # global redirect to https
+      #- "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      #- "traefik.http.routers.http-catchall.entrypoints=web"
+      #- "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      # middleware redirect
+      #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
