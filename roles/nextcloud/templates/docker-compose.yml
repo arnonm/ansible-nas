@@ -1,0 +1,69 @@
+---
+version: "2.1"
+
+volumes:
+  nextcloud:
+  db:
+
+services:
+  db:
+    image: "{{nextcloud_mysql_image}}"
+    container_name: nextcloud_mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - "{{ nextcloud_compose_directory }}/db:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD= "{{nextcloud_sql_root_password}}"
+      - MYSQL_PASSWORD= "{{nextcloud_sql_password}}"
+      - MYSQL_DATABASE= "{{ nextcloud_sql_database }}"
+      - MYSQL_USER= "{{nextcloud_sql_user}}"
+
+  app:
+    image: "{{nextcloud_app_image}}"
+    container_name: nextcloud_app
+    restart: always
+    links:
+      - db
+    volumes:
+      - "{{ nextcloud_compose_directory }}/nextcloud:/var/www/html"
+    environment:
+      - MYSQL_ROOT_PASSWORD= "{{nextcloud_sql_root_password}}"
+      - MYSQL_PASSWORD= "{{nextcloud_sql_password}}"
+      - MYSQL_DATABASE= "{{ nextcloud_sql_database }}"
+      - MYSQL_USER= "{{nextcloud_sql_user}}"
+      - MYSQL_HOST=db
+      - PUID= "{{nextcloud_user_id }}"
+      - PGID= " {{ nextcloud_group_id }}"
+      - TZ= "{{ansible_nas_timezone}}"
+      - NEXTCLOUD_ADMIN_USER= "{{nextcloud_admin_user}}"
+      - NEXTCLOUD_ADMIN_PASSWORD= "{{nextcloud_admin_password}}"
+      - NEXTCLOUD_TRUSTED_DOMAINS= "{{ nextcloud_trusted_domains}}"
+    user: "{{nextcloud_user_id }}:83"
+
+
+
+  web:
+    container_name: nextcloud_nginx
+    image: nginx
+    environment:
+      - TZ= "{{ansible_nas_timezone}}"
+      - PUID= "{{nextcloud_user_id }}"
+      - PGID= " {{ nextcloud_group_id }}"
+    restart: always
+    ports:
+      - "{{nextcloud_port}}:80"
+    links:
+      - app
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    volumes_from:
+      - app
+    labels:
+      traefik.enable: "{{ nextcloud_available_externally | string }}"
+      traefik.http.routers.nextcloud.rule: "Host(`{{ nextcloud_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.nextcloud.tls.certresolver: "letsencrypt"
+      traefik.http.routers.nextcloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.nextcloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.nextcloud.loadbalancer.server.port: "80"
+

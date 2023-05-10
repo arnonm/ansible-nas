@@ -31,6 +31,8 @@ samba_users:
     password: "{{ default_user_password}}"
   - name: yonatan
     password: "{{ default_user_password}}"
+  - name: nextcloud
+    password: "{{ default_user_password }}"
 
 # Shares you want published over Samba.
 samba_shares:
@@ -125,6 +127,58 @@ cockpit_port: 9090
 cockpit_packages: full
 cockpit_identities_enabled: true
 
+
+### Nut
+###
+###
+nut_enabled: true
+nut_managed_config: true
+nut_host: localhost
+nut_user: monitor
+nut_password: "monitor"
+nut_ups:
+  - name: AVIEM
+    driver: "usbhid-ups"
+    port: "auto"
+    description: "Aviem Pro"
+    
+    extra: |
+      #maxretry = 10
+      #retrydelay = 1
+      vendorid = "06DA"
+      productid = "FFFF"
+      bus = "001"
+
+
+### 
+### Netdata
+###
+netdata_enabled: true
+netdata_available_externally: false
+# network
+netdata_hostname: "{{ansible_nas_hostname}}"
+netdata_port: "19999"
+# specs
+netdata_memory: 1g
+netdata_user_id: "1316"
+netdata_group_id: "1316"
+netdata_config_directory: "{{ compose_home }}/netdata/config"
+netdata_compose_directory: "{{ compose_home }}/netdata"
+
+###
+### NextCloud
+###
+nextcloud_enabled: true
+nextcloud_compose_directory: "{{ compose_home }}/nextcloud"
+nextcloud_port: "8083"
+nextcloud_hostname: "nextcloud"
+nextcloud_user_id: "{{mandatory }}"
+nextcloud_group_id: "{{mandatory }}"
+nextcloud_sql_database: "nextcloud"
+nextcloud_app_image: "nextcloud_smb:fpm"
+nextcloud_admin_user: "admin" 
+nextcloud_trusted_domains: "{{ansible_nas_hostname}} {{ansible_nas_fqdn}}"
+
 ###
 ### Mergefs
 ###
@@ -156,7 +210,7 @@ compose_home: /opt/local
 ###
 ### Traefik
 ###
-traefik_enabled: true
+traefik_enabled: false
 traefik_data_directory: "{{ compose_home }}/traefik/data"
 certEmail: "{{ ansible_nas_email }}"
 
@@ -170,9 +224,11 @@ photoprism_storage: "{{ compose_home }}/prism/storage"
 photoprism_database_dir: "{{ compose_home }}/prism/db"
 photoprism_photos_directory: "{{ photos_root }}"
 photoprism_config_directory: "{{ compose_home }}/prism/config"
+photoprism_import: "{{ compose_home }}/prism/import"
+photoprism_letsencrypt: "{{ compose_home }}/prism/letsencrypt"
 photoprism_hostname: "https://{{ansible_nas_fqdn}}"
 photoprism_user_id: "1308"
-photoprism_group_id: "1308"
+photoprism_group_id: "1007"
 photoprism_path: "/photoprism"
 
 
@@ -192,13 +248,13 @@ deluge_config_directory: "{{ compose_home }}/deluge/config"
 deluge_download_directory: "{{ downloads_root }}"
 deluge_watch_directory: "{{ torrents_root }}"
 deluge_user_id: "1312"
-deluge_group_id: "1312"
+deluge_group_id: "1007"
 
 radarr_enabled: true
 radarr_download_directory: "{{ downloads_root }}"
 radarr_data_directory: "{{ compose_home }}/radarr/data"
 radarr_user_id: "1313"
-radarr_group_id: "1313"
+radarr_group_id: "1007"
 
 
 jackett_enabled: true
@@ -209,7 +265,7 @@ sonarr_enabled: true
 sonarr_data_directory: "{{ compose_home }}/sonarr/data"
 sonarr_download_directory: "{{ downloads_root }}"
 sonarr_user_id: "1314"
-sonarr_group_id: "1314"
+sonarr_group_id: "1007"
 
 plex_enabled: true
 plex_config_directory: "{{ compose_home }}/plex/config"
@@ -224,7 +280,7 @@ plex_music_directory: "{{ music_root }}"
 plex_audiobooks_directory: "{{ audiobooks_root }}"
 plex_compose_directory: "{{ compose_home }}/plex"
 plex_user_id: "1309"
-plex_group_id: "1309"
+plex_group_id: "1007"
 plex_devices:
  - "/dev/dri:/dev/dri"
 

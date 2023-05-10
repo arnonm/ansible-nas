@@ -1,0 +1,43 @@
+---
+# docker exec -i nextcloud_app php occ config:app:set password_policy minLength --value 8
+  # docker exec -i nextcloud_app php occ config:app:set password_policy enforceHaveIBeenPwned --value 0
+  # docker exec -i nextcloud_app php occ config:app:set password_policy enforceNonCommonPassword --value 0
+
+- name: Change Password password_policy
+  community.docker.docker_container_exec:
+    container: nextcloud_app
+    argv:
+      - "php"
+      - "occ"
+      - "config:app:set"
+      - "password_policy"
+      - "minLength"
+      - "--value"
+      - "8"
+  register: result
+
+- name: Change Password password_policy
+  community.docker.docker_container_exec:
+    container: nextcloud_app
+    argv:
+      - "php"
+      - "occ"
+      - "config:app:set"
+      - "password_policy"
+      - "enforceHaveIBeenPwned"
+      - "--value"
+      - "0"
+  register: result
+
+- name: Change Password password_policy
+  community.docker.docker_container_exec:
+    container: nextcloud_app
+    argv:
+      - "php"
+      - "occ"
+      - "config:app:set"
+      - "password_policy"
+      - "enforceNonCommonPassword"
+      - "--value"
+      - "0"
+  register: result

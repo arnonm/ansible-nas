@@ -1,0 +1,7 @@
+---
+
+  # php occ files_external:create Joes_Folder ‘smb’ password::password -c host=192.168.0.1 -c share=SharedFolders -c root=Common -c domain=mydomain
+  # this then gave me mount id 3
+  # sudo -u www-data php /var/www/nextcloud/occ files_external:applicable --add-user Joe 3
+  
+

@@ -1,50 +1,85 @@
 ---
+- name: Create Nextcloud group
+  group:
+      name: nextcloud
+      gid: "{{ nextcloud_group_id }}"
+      state: present
+
+- name: Create nextcloud user
+  user:
+      name: prism
+      uid: "{{ nextcloud_user_id }}"
+      state: present
+      system: yes
+      update_password: on_create
+      create_home: no
+      group: nextcloud
+
 - name: Create Nextcloud directories
   file:
     path: "{{ item }}"
     state: directory
   with_items:
-    - "{{ nextcloud_data_directory }}/nextcloud"
-    - "{{ nextcloud_data_directory }}/mysql"
+    - "{{ nextcloud_compose_directory }}/nextcloud"
+    - "{{ nextcloud_compose_directory }}/db"
 
-- name: Nextcloud Mysql Docker Container
-  docker_container:
-    name: nextcloud-mysql
-    image: "{{ nextcloud_mysql_image }}"
-    pull: true
-    volumes:
-      - "{{ nextcloud_data_directory }}/mysql:/var/lib/mysql:rw"
-    env:
-      MYSQL_DATABASE: "nextcloud"
-      MYSQL_USER: "{{ nextcloud_sql_user }}"
-      MYSQL_PASSWORD: "{{ nextcloud_sql_password }}"
-      MYSQL_ROOT_PASSWORD: "{{ nextcloud_sql_root_password }}"
-    restart_policy: unless-stopped
-    memory: "{{ nextcloud_mysql_memory }}"
-
-- name: Nextcloud Docker Container
-  docker_container:
+- name: Change nextcloud samba user
+  user:
     name: nextcloud
-    image: "{{ nextcloud_image }}"
-    pull: true
-    links:
-      - nextcloud-mysql:mysql
-    volumes:
-      - "{{ nextcloud_data_directory }}/nextcloud:/var/www/html:rw"
-    ports:
-      - "{{ nextcloud_port }}:80"
-    env:
-      MYSQL_HOST: "mysql"
-      MYSQL_DATABASE: "nextcloud"
-      MYSQL_USER: "{{ nextcloud_sql_user }}"
-      MYSQL_PASSWORD: "{{ nextcloud_sql_password }}"
-      NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
-    restart_policy: unless-stopped
-    memory: "{{ nextcloud_memory }}"
-    labels:
-      traefik.enable: "{{ nextcloud_available_externally | string }}"
-      traefik.http.routers.nextcloud.rule: "Host(`{{ nextcloud_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.nextcloud.tls.certresolver: "letsencrypt"
-      traefik.http.routers.nextcloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.nextcloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.services.nextcloud.loadbalancer.server.port: "80"
+    password: "{{ nextcloud_user_password | password_hash('sha512') }}"
+    state: present 
+
+- name: modify nextcloud for samba
+  block:
+  - name: copy Dockerfile for smb modification
+    template:
+      src: templates/Dockerfile
+      dest: "{{ nextcloud_compose_directory }}/Dockerfile"
+      user: nextcloud
+
+  - name: Build custom docker image
+    # sudo docker build . -t nextcloud_smb:fpm
+    community.docker.docker_image:
+      build:
+        path: ./
+      name: "netcloud_smb:fpm"
+      push: false
+      source: build
+  when: nextcloud_smb_enable is true
+
+- name: copy Dockerfile for smb modification
+  template:
+    src: templates/docker-compose.yml
+    dest: "{{ nextcloud_compose_directory }}/docker-compose.yml"
+    user: nextcloud
+
+
+- name: copy nginx.conf
+  template:
+    src: templates/nginx.conf
+    dest: "{{ nextcloud_compose_directory}}/nginx.conf"
+    user: nextcloud
+
+
+- name: Build nextcloud
+  docker_compose:
+    state: present
+    build: yes
+    project_src: "{{ nextcloud_compose_directory }}"
+
+- name: Start nextcloud
+  docker_compose:
+    build: no
+    project_src: "{{ nextcloud_compose_directory }}"
+
+
+- name: Configure password policy
+  ansible.builtin.include_tasks: "tasks/configure_passwd_policy.yml"
+
+- name: Configure users
+  ansible.builtin.include_tasks: "tasks/configure_users.yml"
+
+- name: configure external storage
+  ansible.builtin.include_tasks: "tasks/configure_external_storage.yml"
+
+ 
