@@ -61,7 +61,7 @@ services:
       - app
     labels:
       traefik.enable: "{{ nextcloud_available_externally | string }}"
-      traefik.http.routers.nextcloud.rule: "Host(`{{ nextcloud_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.nextcloud.rule: "Host(`{{ ansible_nas_fqdn }}`) && PathPrefix(`{{nextcloud_path}}`)"
       traefik.http.routers.nextcloud.tls.certresolver: "letsencrypt"
       traefik.http.routers.nextcloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.nextcloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"

@@ -5,3 +5,66 @@
   # sudo -u www-data php /var/www/nextcloud/occ files_external:applicable --add-user Joe 3
   
 
+- name: configure nextcloud external storage
+  block:
+
+  - name: Create external mount
+    community.docker.docker_container_exec:
+      container: nextcloud_app
+      argv:
+        - "php"
+        - "occ"
+        - "files_external:create"
+        - "/Documents"
+        - "smb"
+        - "password::password"
+        - "-c"
+        - "host={{ansible_nas_hostname}}"
+        - "-c"
+        - "shared=documents"
+        - "-c"
+        - "root={{item.name}}"
+    register: result
+
+  - name: Add external mount
+    community.docker.docker_container_exec:
+      container: nextcloud_app
+      argv:
+        - "php"
+        - "occ"
+        - "files_external:applicable"
+        - "--add-user"
+        - "{{item.name}}"
+        - "{{result}}"
+
+
+  - name: Create external mount
+    community.docker.docker_container_exec:
+      container: nextcloud_app
+      argv:
+        - "php"
+        - "occ"
+        - "files_external:create"
+        - "/Shared_Documents"
+        - "smb"
+        - "password::password"
+        - "-c"
+        - "host={{ansible_nas_hostname}}"
+        - "-c"
+        - "shared=documents"
+        - "-c"
+        - "root=shared"
+    register: result
+
+  - name: Add external mount
+    community.docker.docker_container_exec:
+      container: nextcloud_app
+      argv:
+        - "php"
+        - "occ"
+        - "files_external:applicable"
+        - "--add-user"
+        - "{{item.name}}"
+        - "{{result}}"
+
+  with_items: "{{regular_users}}"

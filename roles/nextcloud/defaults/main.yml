@@ -13,6 +13,7 @@ nextcloud_user_id: "{{mandatory }}"
 nextcloud_group_id: "{{mandatory }}"
 nextcloud_smb_enable: true
 nextcloud_user_quota: "1MB"
+nextcloud_path: "nextcloud"
 
 # network
 nextcloud_port: "8080"
