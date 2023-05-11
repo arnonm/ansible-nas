@@ -4,7 +4,13 @@
     - name: Copy package to host
       copy:
         remote_src: false
-        src: "{{ local_dep_filename }}"
+        src: "files/{{ local_dep_filename }}"
+        dest: /tmp/
+
+    - name: copy configuration file
+      copy:
+        remote_src: false
+        src: "files/export.cbbconfiguration"
         dest: /tmp/
 
     - name: Download and install package
@@ -23,4 +29,9 @@
         chdir: "{{cloudberry_path}}"
         cmd: "./cbb option -set wa -http on"
   
+    - name: Import configuration
+      ansible.builtin.command:
+        chdir: "{{ cloudberry_path }}"
+        cmd: "./cbb importConfig -f /tmp/export.cbbconfiguration -m"
+        
   when: cloudberry_enabled is true
