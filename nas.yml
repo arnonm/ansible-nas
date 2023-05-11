@@ -68,6 +68,11 @@
         - ansible-letsencrypt
       when: (letsencrypt_enabled | default(False))
 
+    - role: ntd.nut
+      tags:
+        - ansible-nut
+      when: (nut_enabled | default (False))
+
     ###
     ### Ansible-NAS Roles
     ###
