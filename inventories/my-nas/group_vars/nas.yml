@@ -153,7 +153,7 @@ nut_ups:
 ### 
 ### Netdata
 ###
-netdata_enabled: true
+netdata_enabled: false
 netdata_available_externally: false
 # network
 netdata_hostname: "{{ansible_nas_hostname}}"
@@ -172,12 +172,12 @@ nextcloud_enabled: true
 nextcloud_compose_directory: "{{ compose_home }}/nextcloud"
 nextcloud_port: "8083"
 nextcloud_hostname: "nextcloud"
-nextcloud_user_id: "{{mandatory }}"
-nextcloud_group_id: "{{mandatory }}"
+nextcloud_user_id: "1318"
+nextcloud_group_id: "1318"
 nextcloud_sql_database: "nextcloud"
-nextcloud_app_image: "nextcloud_smb:fpm"
+nextcloud_app_image: "nextcloud:apache"
 nextcloud_admin_user: "admin" 
-nextcloud_trusted_domains: "{{ansible_nas_hostname}} {{ansible_nas_fqdn}}"
+nextcloud_trusted_domains: "{{ansible_nas_hostname}}:{{nextcloud_port}} {{ansible_nas_fqdn}}/{{nextcloud_hostname}}"
 
 ###
 ### Mergefs
