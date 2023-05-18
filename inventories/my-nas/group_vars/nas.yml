@@ -149,6 +149,24 @@ nut_ups:
       productid = "FFFF"
       bus = "001"
 
+###
+### Stirling
+###
+stirling_enabled: true
+stirling_available_externally: false
+
+stirling_compose_directory: "{{compose_home}}/stirlingpdf "
+stirling_data_directory:  "{{stirling_compose_directory}}/data"
+stirling_container_name: "stirling-pdf"
+
+# uid / gid
+stirling_user_id: "1319"
+stirling_group_id: "1319"
+
+# network
+stirling_port: "8084"
+stirling_memory: 1g
+
 
 ### 
 ### Netdata

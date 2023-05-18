@@ -1,0 +1,18 @@
+stirling_enabled: false
+stirling_available_externally: false
+
+stirling_compose_directory: "{{compose_home}}/stirlingpdf "
+stirling_data_directory:  "{{compose_home}}/data"
+stirling_container_name: "stirling-pdf"
+
+
+# uid / gid
+stirling_user_id: "{{mandatory}}"
+stirling_group_id: "{{mandatory}}"
+
+# network
+stirling_port: "7878"
+stirling_hostname: "radarr"
+stirling_memory: 1g
+stirling_app_locale: "en_GB"
+stirling_app_name: "Stirling PDF"

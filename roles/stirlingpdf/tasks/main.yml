@@ -1,0 +1,51 @@
+---
+- name: Start stirling
+  block:
+      - name: Create stirling group
+        group:
+          name: stirling
+          gid: "{{ stirling_group_id }}"
+          state: present
+
+      - name: Create stirling user
+        user:
+          name: stirling
+          uid: "{{ stirling_user_id }}"
+          state: present
+          system: yes
+          update_password: on_create
+          create_home: no
+          group: stirling
+          groups: "{{samba_force_group}}"
+
+      - name: Create stirling Directories
+        file:
+          path: "{{ item }}"
+          state: directory
+        with_items:
+          - "{{ stirling_data_directory }}"
+
+      - name: Template over docker-compose.yml file
+        template:
+          src: templates/docker-compose.yml
+          dest: "{{stirling_compose_directory}}/docker-compose.yml"
+          owner: stirling
+          group: stirling
+
+      # - name: Stop existing photoprism
+      #   docker_compose:
+      #     build: no
+      #     stopped: yes
+      #     project_src: "{{photoprism_compose_directory}}"
+ 
+      - name: Build docker
+        docker_compose:
+          state: present
+          build: yes
+          project_src: "{{ stirling_compose_directory }}"
+
+      - name: Start docker
+        docker_compose:
+          build: no
+          project_src: "{{ stirling_compose_directory }}"
+  when: stirling_enabled is true
