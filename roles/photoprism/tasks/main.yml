@@ -75,6 +75,14 @@
           exec: "photoprism users add --name {{item.comment}} --email {{item.email}} --password {{item.password}} -w {{item.name}} "
         loop: "{{ regular_users }}"
 
+
+      - name: Add extra users to Photoprism
+        docker_compose:
+          build: no 
+          project_src: "{{ photoprism_compose_directory }}"
+          exec: "photoprism users add --name {{item.comment}} --email {{item.email}} --password {{item.password}} -w {{item.name}} "
+        loop: "{{ extra_users }}"
+
     when: photoprism_enabled is true
 
   - name: Stop Photoprism
