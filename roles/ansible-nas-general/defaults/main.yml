@@ -19,7 +19,8 @@ ansible_nas_extra_packages:
   - python3
   - vim
   - exiftool
-  - screen ̰
+  - screen 
+  - exiv2 
 
 # Sets the timezone for your Ansible NAS
 # You can find a list here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
