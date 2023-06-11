@@ -1,0 +1,39 @@
+---
+- name: install dependencies
+  apt:
+    name: "python-markdown mailutils curl"
+    state: present
+  register: result
+  until: result is succeeded
+
+  
+- name: install configuration file
+  template:
+    src: templates/script-config.j2
+    dest: "{{ snapraid_runner_directory }}/script-config.sh"
+    owner: root
+    group: root
+    mode: 0775
+
+- name: install script file
+  ansible.builtin.copy:
+    src: "files/snapraid-aio-script.sh"
+    dest: "{{ snapraid_runner_directory }}/snapraid-aio-script.sh"
+    remote_src: true
+    owner: root
+    group: root
+    mode: 0775
+
+
+
+- name: setup cron job snapraid-aio
+  cron:
+    user: "root"
+    job: "{{ item.job }}"
+    name: "{{ item.name }}"
+    weekday: "{{ item.weekday | default ('*') }}"
+    minute: "{{ item.minute | default ('00')}}"
+    hour: "{{ item.hour | default ('00') }}"
+    dom: "{{ item.dom|default('*') }}"
+  with_items:
+    - "{{ snapraid_aio_cron_jobs }}"

@@ -1,0 +1,24 @@
+---
+- name: Install snapraid
+  block:
+    
+  - name: install snapraid
+    include_tasks: install-debian.yml
+    when: ansible_os_family == 'Debian' and snapraid_install
+
+  - name: configure snapraid
+    include_tasks: configure.yml
+
+  - name: install and configure snapraid-runner
+    include_tasks: snapraid-runner.yml
+    when: snapraid_runner
+
+  - name: schedule snapraid
+    include_tasks: cron.yml
+    when: not snapraid_runner
+
+  - name: install snapraid-aoi-script
+    include_tasks: install-snapraid-aio-script.yml
+    when: snapraid_aio
+  
+  when: (snapraid_enabled is true)
