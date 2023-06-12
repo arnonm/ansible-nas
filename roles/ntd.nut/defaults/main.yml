@@ -59,4 +59,8 @@ nut_upsmon_extra: |
 # When set, NOTIFYCMD will be configured to this path
 
 # When set, the content will be copied to the nut_upsmon_notifycmd path
-nut_upsmon_notifycmd_content: true
+nut_upsmon_notifycmd_content: {
+NOTIFYFLAG ONLINE SYSLOG+EXEC
+NOTIFYFLAG ONBATT SYSLOG+EXEC
+NOTIFYFLAG LOWBATT SYSLOG+EXEC
+}
