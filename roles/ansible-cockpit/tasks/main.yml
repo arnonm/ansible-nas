@@ -50,7 +50,6 @@
       include_tasks: manage_certificates.yml 
       when: letsencrypt_enabled
 
-    - name: Install 
     - name: Restart Cockpit
       service:
         name: "cockpit"
