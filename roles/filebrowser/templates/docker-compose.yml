@@ -1,0 +1,22 @@
+---
+version: "3"
+
+services:
+  {{filebrowser_service_name}}:
+    image: "{{  }}"
+    container_name: "{{filebrowser_container_name}}"
+    restart: always
+    ports:
+      - "{{filebrowser_port}}:80"
+    volumes:
+      - "/mnt/storage/samba/documents:/srv"
+      - "{{filebrowser_data_directory}}:/db"
+      - "{{filebrowser_compose_directory}}/filebrowser.json:/filebrowser.json"
+        #user: "1318:83"
+    labels:
+      traefik.enable: "False"
+      traefik.http.routers.nextcloud.rule: "Host(`dsmhome.ddns.net`) && PathPrefix(`nextcloud`)"
+      traefik.http.routers.nextcloud.tls.certresolver: "letsencrypt"
+      traefik.http.routers.nextcloud.tls.domains[0].main: "ddns.net"
+      traefik.http.routers.nextcloud.tls.domains[0].sans: "*.ddns.net"
+      traefik.http.services.nextcloud.loadbalancer.server.port: "80"

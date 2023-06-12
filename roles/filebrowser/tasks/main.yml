@@ -1,0 +1,68 @@
+---
+- name: Start filebrowser
+  block:
+      - name: Create filebrowser group
+        group:
+          name: filebrowser
+          gid: "{{ filebrowser_group_id }}"
+          state: present
+
+      - name: Create filebrowser user
+        user:
+          name: filebrowser
+          uid: "{{ filebrowser_user_id }}"
+          state: present
+          system: yes
+          update_password: on_create
+          create_home: no
+          group: filebrowser
+          groups: "{{samba_force_group}}"
+
+      - name: Create filebrowser Directories
+        file:
+          path: "{{ item }}"
+          state: directory
+        with_items:
+          - "{{ filebrowser_compose_directory }}"
+          - "{{ filebrowser_compose_directory }}/web"
+          - "{{ filebrowser_data_directory }}"
+
+      - name: Template over docker-compose.yml file
+        template:
+          src: templates/docker-compose.yml
+          dest: "{{filebrowser_compose_directory}}/docker-compose.yml"
+          owner: filebrowser
+          group: filebrowser
+
+
+      - name: copy docker files
+        template:
+          src: "{{item}}"
+          dest: "{{ filebrowser_compose_directory }}/web"
+          owner: filebrowser
+        with_items:
+          - "templates/Dockerfile"
+          - "templates/filebrowser_entry.sh"
+          - "templates/filebrowser_runonce.sh"
+          - "templates/filebrowser.json"
+
+      - name: create Docker image 
+      # sudo docker build . -t nextcloud_smb:fpm
+        community.docker.docker_image:
+          name: "{{ filebrowser_image_name }}"
+          build:
+            path: "{{ filebrowser_compose_directory }}/web"
+          push: false
+          source: build
+
+      - name: Build docker
+        docker_compose:
+          state: present
+          build: yes
+          project_src: "{{ filebrowser_compose_directory }}"
+
+      - name: Start docker
+        docker_compose:
+          build: no
+          project_src: "{{ filebrowser_compose_directory }}"
+  when: filebrowser_enabled is true

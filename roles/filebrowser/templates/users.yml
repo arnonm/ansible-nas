@@ -1,0 +1,24 @@
+- id: 1
+  username: admin
+  password: $2a$10$W.sI9q8uI0gX6BYUNUcOmeI5WVKXgpyWxSgVDAWTE39z32kX3zsL.
+  scope: .
+  locale: en
+  lockpassword: false
+  viewmode: mosaic
+  singleclick: false
+  perm:
+    admin: true
+    execute: true
+    create: true
+    rename: true
+    modify: true
+    delete: true
+    share: true
+    download: true
+  commands: []
+  sorting:
+    by: name
+    asc: false
+  rules: []
+  hidedotfiles: false
+  dateformat: false

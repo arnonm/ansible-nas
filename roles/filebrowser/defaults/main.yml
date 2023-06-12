@@ -1,0 +1,21 @@
+---
+c: false
+filebrowser_available_externally: false
+
+# directories
+filebrowser_data_directory: "{{ compose_home }}/filebrowser/db"
+filebrowser_compose_directory: "{{ compose_home }}/filebrowser"
+
+filebrowser_service_name: "filebrowser"
+filebrowser_container_name: "filebrowser"
+filebrowser_image_name: "filebrowser/filebrowser:ansible-nas"
+
+# uid / gid
+filebrowser_user_id: "{{mandatory}}"
+filebrowser_group_id: "{{mandatory}}"
+
+# network
+filebrowser_port: "8083"
+
+# specs
+sonarr_memory: 1g
