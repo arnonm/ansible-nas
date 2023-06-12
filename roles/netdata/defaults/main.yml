@@ -2,9 +2,15 @@
 netdata_enabled: false
 netdata_available_externally: false
 
+netdata_container_name: "netdata"
+netdata_config_directory: "{{ docker_home }}/netdata/config"
+netdata_compose_directory: "{{ docker_home }}/netdata"
 # network
 netdata_hostname: "netdata"
 netdata_port: "19999"
 
+netdata_user_id: "{{mandatory}}"
+netdata_user_name: "netdata"
+netdata_group_id: "{{mandatory}}"
 # specs
 netdata_memory: 1g

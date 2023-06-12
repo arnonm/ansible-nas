@@ -1,34 +1,89 @@
 ---
+#  Based on https://gist.github.com/Jiab77/0778ef11a441f49df62e2b65f3daef76
 - name: Get docker group id
   group:
     name: docker
   register: docker_group
 
-- name: Netdata Docker Container
-  docker_container:
-    name: netdata
-    hostname: "{{ ansible_nas_hostname }}.{{ ansible_nas_domain }}"
+- name: Create netdata group
+  group:
+        name: netdata
+        gid: "{{ netdata_group_id }}"
+        state: present
+
+- name: Create netdata user
+  user:
+        name: netdata
+        uid: "{{ netdata_user_id }}"
+        state: present
+        system: yes
+        update_password: on_create
+        create_home: no
+        group: netdata
+
+- name: Create netdata Directories
+  file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{netdata_user_id}}"
+      group: "{{netdata_group_id}}"
+        # mode: 0755
+  with_items:
+      - "{{ netdata_config_directory }}"
+
+  
+- name: setup temp netdata container
+  #mkdir /opt/local/netdata/config/netdata
+  #mkdir netdataconfig
+  docker_container: 
+    name: netdata_tmp
     image: netdata/netdata
-    state: started
-    pull: true
-    ports:
-      - "{{ netdata_port }}:19999"
-    volumes:
-      - "/proc:/host/proc:ro"
-      - "/sys:/host/sys:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    env:
-      PGID: "{{ docker_group.gid }}"
-    capabilities:
-      - SYS_PTRACE
-    security_opts:
-      - apparmor:unconfined
-    restart_policy: unless-stopped
-    memory: "{{ netdata_memory }}"
-    labels:
-      traefik.enable: "{{ netdata_available_externally | string }}"
-      traefik.http.routers.netdata.rule: "Host(`{{ netdata_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.netdata.tls.certresolver: "letsencrypt"
-      traefik.http.routers.netdata.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.netdata.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.services.netdata.loadbalancer.server.port: "19999"
+    pull: yes
+
+- name: copy temp data
+  # community.docker.docker_container_copy_into:
+  #   container: netdata_tmp
+  #   path: "{{netdata_config_directory}}"
+  #   container_path: /etc/nc
+  ansible.builtin.command:
+    chdir: /etc
+    cmd: "docker cp netdata_tmp:/etc/netdata {{netdata_config_directory}}"
+  become: true
+
+- name: remove temp netdata container
+  docker_container:
+    name: netdata_tmp
+    state: absent
+
+- name: Overwrite local data
+  template:
+        src: "templates/nut.conf"
+        dest: "{{netdata_config_directory}}/charts.d/nut.conf"
+        owner: netdata
+        group: netdata
+
+- name: Template over docker-compose.yml file
+  template:
+        src: "templates/docker-compose.yml"
+        dest: "{{netdata_compose_directory}}/docker-compose.yml"
+        owner: netdata
+        group: netdata
+
+- name: Stop existing container
+  docker_compose:
+        build: no
+        stopped: yes
+        project_src: "{{ netdata_compose_directory }}"
+  ignore_errors: true
+
+- name: Build container
+  docker_compose:
+    state: present
+    build: yes
+    project_src: "{{ netdata_compose_directory }}"
+
+- name: Start container
+  docker_compose:
+    build: no
+    project_src: "{{ netdata_compose_directory }}"
+

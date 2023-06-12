@@ -1,0 +1,36 @@
+version: "3.5"
+services:
+  {{netdata_container_name}}:
+    container_name: "{{netdata_container_name}}"
+    image: netdata/netdata
+    hostname: "{{ ansible_nas_hostname }}.{{ ansible_nas_domain }}"
+    ports:
+      - "{{ netdata_port }}:19999"
+    volumes:
+      - /opt/local/netdata/config/netdata:/etc/netdata:ro
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+    environment:
+      PGID: "{{ docker_group.gid }}"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    restart: unless-stopped
+    #memory: "{{ netdata_memory }}"
+    labels:
+      traefik.enable: "{{ netdata_available_externally | string }}"
+      traefik.http.routers.netdata.rule: "Host(`{{ netdata_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.netdata.tls.certresolver: "letsencrypt"
+      traefik.http.routers.netdata.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.netdata.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.netdata.loadbalancer.server.port: "19999"
+  
+volumes:
+  netdatalib:
+  netdatacache:
