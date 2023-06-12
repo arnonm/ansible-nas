@@ -127,6 +127,12 @@ cockpit_port: 9090
 cockpit_packages: full
 cockpit_identities_enabled: true
 
+###
+###
+###
+filebrowser_enabled: true
+filebrowser_group_id: 1319
+filebrowser_user_id: 1319
 
 ### Nut
 ###
@@ -193,7 +199,7 @@ nextcloud_hostname: "nextcloud"
 nextcloud_user_id: "1318"
 nextcloud_group_id: "1318"
 nextcloud_sql_database: "nextcloud"
-nextcloud_app_image: "nextcloud:apache"
+nextcloud_app_image: "nextcloud:apache-smb"
 nextcloud_admin_user: "admin" 
 nextcloud_trusted_domains: "{{ansible_nas_hostname}}:{{nextcloud_port}} {{ansible_nas_fqdn}}/{{nextcloud_hostname}}"
 
