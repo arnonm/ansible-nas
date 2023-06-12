@@ -1,9 +1,5 @@
 ---
-version: "2.1"
-
-volumes:
-  nextcloud:
-  db:
+version: "3"
 
 services:
   db:
@@ -12,53 +8,24 @@ services:
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     volumes:
-      - "{{ nextcloud_compose_directory }}/db:/var/lib/mysql"
-    environment:
-      - MYSQL_ROOT_PASSWORD= "{{nextcloud_sql_root_password}}"
-      - MYSQL_PASSWORD= "{{nextcloud_sql_password}}"
-      - MYSQL_DATABASE= "{{ nextcloud_sql_database }}"
-      - MYSQL_USER= "{{nextcloud_sql_user}}"
+      - "{{ nextcloud_compose_directory }}/db:/var/lib/mysql:Z"
+    env_file:
+      - "{{ nextcloud_db_envfile }}"
+      
 
   app:
     image: "{{nextcloud_app_image}}"
     container_name: nextcloud_app
     restart: always
-    links:
+    depends_on:
       - db
-    volumes:
-      - "{{ nextcloud_compose_directory }}/nextcloud:/var/www/html"
-    environment:
-      - MYSQL_ROOT_PASSWORD= "{{nextcloud_sql_root_password}}"
-      - MYSQL_PASSWORD= "{{nextcloud_sql_password}}"
-      - MYSQL_DATABASE= "{{ nextcloud_sql_database }}"
-      - MYSQL_USER= "{{nextcloud_sql_user}}"
-      - MYSQL_HOST=db
-      - PUID= "{{nextcloud_user_id }}"
-      - PGID= " {{ nextcloud_group_id }}"
-      - TZ= "{{ansible_nas_timezone}}"
-      - NEXTCLOUD_ADMIN_USER= "{{nextcloud_admin_user}}"
-      - NEXTCLOUD_ADMIN_PASSWORD= "{{nextcloud_admin_password}}"
-      - NEXTCLOUD_TRUSTED_DOMAINS= "{{ nextcloud_trusted_domains}}"
-    user: "{{nextcloud_user_id }}:83"
-
-
-
-  web:
-    container_name: nextcloud_nginx
-    image: nginx
-    environment:
-      - TZ= "{{ansible_nas_timezone}}"
-      - PUID= "{{nextcloud_user_id }}"
-      - PGID= " {{ nextcloud_group_id }}"
-    restart: always
     ports:
       - "{{nextcloud_port}}:80"
-    links:
-      - app
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    volumes_from:
-      - app
+      - "{{ nextcloud_compose_directory }}/nextcloud:/var/www/html:z"
+    env_file:
+      - "{{ nextcloud_db_envfile }}"
+    user: "{{nextcloud_user_id }}:83"
     labels:
       traefik.enable: "{{ nextcloud_available_externally | string }}"
       traefik.http.routers.nextcloud.rule: "Host(`{{ ansible_nas_fqdn }}`) && PathPrefix(`{{nextcloud_path}}`)"
@@ -67,3 +34,27 @@ services:
       traefik.http.routers.nextcloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
       traefik.http.services.nextcloud.loadbalancer.server.port: "80"
 
+  # web: 
+  #   build: ./web
+  #   container_name: nextcloud_web
+  #   restart: always
+  #   ports:
+  #     - "{{nextcloud_port}}:80"
+  #   volumes:
+  #     - "{{ nextcloud_compose_directory }}/nextcloud:/var/www/html:z"
+  #   depends_on:
+  #     - app
+
+  cron:
+    image: nextcloud:apache
+    container_name: nextcloud_cron
+    restart: always
+    volumes:
+      - "{{ nextcloud_compose_directory }}/nextcloud:/var/www/html:z"
+    entrypoint: /cron.sh
+    depends_on:
+      - db
+
+volumes:
+  nextcloud:
+  db:

@@ -12,7 +12,7 @@ nextcloud_mysql_image: "mariadb:10.6"
 nextcloud_user_id: "{{mandatory }}"
 nextcloud_group_id: "{{mandatory }}"
 nextcloud_smb_enable: true
-nextcloud_user_quota: "1MB"
+nextcloud_user_quota: "1 MB"
 nextcloud_path: "nextcloud"
 
 # network
@@ -24,6 +24,7 @@ nextcloud_sql_user: "nextcloud-user"
 nextcloud_sql_password: "nextcloud-pass"
 nextcloud_sql_root_password: "nextcloud-secret"
 nextcloud_sql_database: "nextcloud"
+nextcloud_db_envfile: "db.env"
 
 # specs
 nextcloud_memory: 1g

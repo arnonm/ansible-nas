@@ -1,4 +1,9 @@
 ---
+
+- name: configure external storage
+  ansible.builtin.include_tasks: "tasks/configure_external_storage.yml"
+
+ 
 - name: Create Nextcloud group
   group:
       name: nextcloud
@@ -7,7 +12,7 @@
 
 - name: Create nextcloud user
   user:
-      name: prism
+      name: nextcloud
       uid: "{{ nextcloud_user_id }}"
       state: present
       system: yes
@@ -19,9 +24,12 @@
   file:
     path: "{{ item }}"
     state: directory
+    owner: nextcloud
+    group: nextcloud
   with_items:
     - "{{ nextcloud_compose_directory }}/nextcloud"
     - "{{ nextcloud_compose_directory }}/db"
+    - "{{ nextcloud_compose_directory }}/web"
 
 - name: Change nextcloud samba user
   user:
@@ -31,34 +39,40 @@
 
 - name: modify nextcloud for samba
   block:
-  - name: copy Dockerfile for smb modification
+
+  - name: copy Dockerfile for web
     template:
-      src: templates/Dockerfile
-      dest: "{{ nextcloud_compose_directory }}/Dockerfile"
-      user: nextcloud
+      src: templates/web/Dockerfile
+      dest: "{{ nextcloud_compose_directory }}/web/Dockerfile"
+      owner: nextcloud
+
+  - name: copy Dockerfile for web
+    template:
+      src: templates/web/nginx.conf
+      dest: "{{ nextcloud_compose_directory }}/web/nginx.conf"
+      owner: nextcloud
+
+  - name: copy Dockerfile for web
+    template:
+      src: templates/db.env
+      dest: "{{ nextcloud_compose_directory }}/db.env"
+      owner: nextcloud
 
   - name: Build custom docker image
     # sudo docker build . -t nextcloud_smb:fpm
     community.docker.docker_image:
       build:
-        path: ./
-      name: "netcloud_smb:fpm"
+        path: "{{ nextcloud_compose_directory }}/web"
+      name: "{{nextcloud_app_image}}"
       push: false
       source: build
   when: nextcloud_smb_enable is true
 
-- name: copy Dockerfile for smb modification
+- name: copy Docker compose file
   template:
-    src: templates/docker-compose.yml
+    src: "templates/docker-compose.yml"
     dest: "{{ nextcloud_compose_directory }}/docker-compose.yml"
-    user: nextcloud
-
-
-- name: copy nginx.conf
-  template:
-    src: templates/nginx.conf
-    dest: "{{ nextcloud_compose_directory}}/nginx.conf"
-    user: nextcloud
+    owner: nextcloud
 
 
 - name: Build nextcloud
@@ -74,7 +88,7 @@
 
 
 - name: Configure password policy
-  ansible.builtin.include_tasks: "tasks/configure_passwd_policy.yml"
+  ansible.builtin.include_tasks: "tasks/configure_server.yml"
 
 - name: Configure users
   ansible.builtin.include_tasks: "tasks/configure_users.yml"

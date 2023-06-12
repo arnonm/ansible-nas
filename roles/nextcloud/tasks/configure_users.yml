@@ -1,39 +1,35 @@
 ---
+- name: Create user
+  community.docker.docker_container_exec:
+    container: nextcloud_app
+    env: 
+      OC_PASS: "{{default_user_password}}"
+    argv:
+      - "php"
+      - "occ"
+      - "user:add"
+      - "--display-name={{item.comment}}"
+      - "--password-from-env"
+      - "{{item.name}}"
+  register: result
+  loop: "{{regular_users}}"
 
- # OC_PASS=xxx docker exec -i nextcloud_app php occ user:add --display-name="XXX" --password-from-env name
-  # docker exec -i nextcloud_app php occ user:setting XXXX display_name XXXX
-  # docker exec -i nextcloud_app php occ user:setting XXXX email XXXX
-  # docker exec -i nextcloud_app php occ user:setting XXXX files quota 1MB
-- name: add nextcloud users
-  block:
+- name: Add email
+  community.docker.docker_container_exec:
+    container: nextcloud_app
+    argv:
+      - "php"
+      - "occ"
+      - "user:setting"
+      - "{{item.name}}"
+      - "settings"
+      - "email"
+      - "{{item.email}}"
+  register: result
+  loop: "{{regular_users}}"
 
-  - name: Create user
-    community.docker.docker_container_exec:
-      container: nextcloud_app
-      argv:
-        - "OC_PASS='{{default_user_password}}'"
-        - "php"
-        - "occ"
-        - "user:add"
-        - "--display-name='{{item.comment}}'"
-        - "--password-from-env"
-        - "{{item.name}}"
-    register: result
-
-  - name: Add email
-    community.docker.docker_container_exec:
-      container: nextcloud_app
-      argv:
-        - "php"
-        - "occ"
-        - "user:setting"
-        - "{{item.name}}"
-        - "email"
-        - "{{item.email}}"
-    register: result
-
-  - name: Change quota
-    community.docker.docker_container_exec:
+- name: Change quota
+  community.docker.docker_container_exec:
       container: nextcloud_app
       argv:
         - "php"
@@ -41,7 +37,7 @@
         - "user:setting"
         - "{{item.name}}"
         - "files"
+        - "quota"
         - "{{ nextcloud_user_quota}}"
-    register: result
-
-  with_items: "{{regular_users}}"
+  register: result
+  loop: "{{regular_users}}"

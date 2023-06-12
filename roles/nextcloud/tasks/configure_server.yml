@@ -3,6 +3,33 @@
   # docker exec -i nextcloud_app php occ config:app:set password_policy enforceHaveIBeenPwned --value 0
   # docker exec -i nextcloud_app php occ config:app:set password_policy enforceNonCommonPassword --value 0
 
+# - name: install server
+#   community.docker.docker_container_exec:
+#     container: nextcloud_app
+#     argv:
+#       - "php"
+#       - "occ"
+#       - "maintenance:install"
+#       - "--database mysql"
+#       - "--database-name {{nextcloud_sql_database}}"
+#       - "--database-host db"
+#       - "--database-user {{nextcloud_sql_user}}"
+#       - "--database-pass {{nextcloud_sql_password}}"
+#       - "--admin-user {{nextcloud_admin_user}}"
+#       - "--admin-pass {{nextcloud_admin_password}}"
+#   register: result
+- name: wait for server to install
+  community.docker.docker_container_exec:
+    container: nextcloud_app
+    argv:
+      - "php"
+      - "occ"
+      - "status"
+  register: result
+  until: '"installed: true" in result.stdout'
+  retries: 10
+  delay: 5
+
 - name: Change Password password_policy
   community.docker.docker_container_exec:
     container: nextcloud_app
@@ -41,3 +68,4 @@
       - "--value"
       - "0"
   register: result
+
