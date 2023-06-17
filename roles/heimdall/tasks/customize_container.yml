@@ -1,0 +1,24 @@
+---
+- name: Create Heimdall custom Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    # owner: heimdall
+    # group: heimdall
+  with_items:
+    - "{{ heimdall_compose_directory }}/custom"
+    - "{{ heimdall_compose_directory }}/custom/files"
+
+- name: add custom script
+  ansible.builtin.copy:
+    src: "files/add_custom_item"
+    dest: "{{ heimdall_data_directory }}/custom/"
+
+- name: add modified file
+  ansible.builtin.copy:
+    src: "files/Item.php"
+    dest: "{{ heimdall_compose_directory }}/custom/files"
+
+- name: set special volume
+  set_fact:
+    heimdall_custom_volume: '- "{{ heimdall_compose_directory }}/custom:/custom-cont-init.d:ro"'

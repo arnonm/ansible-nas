@@ -1,0 +1,5 @@
+#!/bin/bash
+
+[ -f /custom-cont-init.d/files/Item.php ] && cp /custom-cont-init.d/files/Item.php /app/www/app/
+~
+~

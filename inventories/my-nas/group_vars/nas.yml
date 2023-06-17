@@ -147,7 +147,7 @@ nut_ups:
     driver: "usbhid-ups"
     port: "auto"
     description: "Aviem Pro"
-    
+
     extra: |
       #maxretry = 10
       #retrydelay = 1
@@ -162,7 +162,7 @@ stirling_enabled: true
 stirling_available_externally: false
 
 stirling_compose_directory: "{{compose_home}}/stirlingpdf "
-stirling_data_directory:  "{{stirling_compose_directory}}/data"
+stirling_data_directory: "{{stirling_compose_directory}}/data"
 stirling_container_name: "stirling-pdf"
 
 # uid / gid
@@ -173,8 +173,7 @@ stirling_group_id: "1319"
 stirling_port: "8084"
 stirling_memory: 1g
 
-
-### 
+###
 ### Netdata
 ###
 netdata_enabled: false
@@ -200,7 +199,7 @@ nextcloud_user_id: "1318"
 nextcloud_group_id: "1318"
 nextcloud_sql_database: "nextcloud"
 nextcloud_app_image: "nextcloud:apache-smb"
-nextcloud_admin_user: "admin" 
+nextcloud_admin_user: "admin"
 nextcloud_trusted_domains: "{{ansible_nas_hostname}}:{{nextcloud_port}} {{ansible_nas_fqdn}}/{{nextcloud_hostname}}"
 
 ###
@@ -255,17 +254,18 @@ photoprism_user_id: "1308"
 photoprism_group_id: "1007"
 photoprism_path: "/photoprism"
 
-
 heimdall_enabled: true
 heimdall_port_http: 8081
 heimdall_data_directory: "{{ compose_home }}/heimdall" # Needs to be changed
+heimdall_compose_directory: "{{ compose_home }}/heimdall" # Needs to be changed
+heimdall_config_directory: "{{ compose_home }}/heimdall/config"
 heimdall_user_id: "1310"
 heimdall_group_id: "1310"
+heimdall_customize_container: true
 
 homer_enabled: false
 homer_port: "8082"
 homer_compose_directory: "{{ compose_home }}/homer"
-
 
 deluge_enabled: true
 deluge_config_directory: "{{ compose_home }}/deluge/config"
@@ -279,7 +279,6 @@ radarr_download_directory: "{{ downloads_root }}"
 radarr_data_directory: "{{ compose_home }}/radarr/data"
 radarr_user_id: "1313"
 radarr_group_id: "1007"
-
 
 jackett_enabled: true
 jackett_data_directory: "{{ compose_home }}/jackett/data"
@@ -306,7 +305,7 @@ plex_compose_directory: "{{ compose_home }}/plex"
 plex_user_id: "1309"
 plex_group_id: "1007"
 plex_devices:
- - "/dev/dri:/dev/dri"
+  - "/dev/dri:/dev/dri"
 
 route53_ddns_enabled: false
 route53_host: "{{ansible_nas_hostname}}.{{ ansible_nas_domain }}"
@@ -419,4 +418,3 @@ paperless_ng_port: "16922"
 paperless_ng_hostname: "{{ansible_nas_fqdn}}"
 paperless_ng_user_id: 1315
 paperless_ng_group_id: 1315
-

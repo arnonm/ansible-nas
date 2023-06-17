@@ -1,0 +1,25 @@
+---
+version: "3"
+
+services:
+  heimdall:
+    container_name: "{{ heimdall_container_name }}"
+    image: "{{ heimdall_docker_image }}"
+    restart: unless-stopped
+    volumes:
+      - "{{ heimdall_config_directory }}:/config:rw"
+      {{ heimdall_custom_volume }}
+    environment:
+      PUID: "{{ heimdall_user_id }}"
+      PGID: "{{ heimdall_group_id }}"
+      TZ: "{{ ansible_nas_timezone }}"
+    ports:
+      - "{{ heimdall_port_http }}:80"
+      - "{{ heimdall_port_https }}:443"
+    labels:
+      traefik.enable: "{{ heimdall_available_externally | string }}"
+      traefik.http.routers.nextcloud.rule: "Host(`{{ ansible_nas_fqdn }}`) && PathPrefix(`{{heimdall_path}}`)"
+      traefik.http.routers.heimdall.tls.certresolver: "letsencrypt"
+      traefik.http.routers.heimdall.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.heimdall.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.services.heimdall.loadbalancer.server.port: "80"

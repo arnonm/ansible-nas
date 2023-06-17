@@ -1,0 +1,38 @@
+---
+- name: Create Heimdall working Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    # owner: heimdall
+    # group: heimdall
+  with_items:
+    - "{{ heimdall_data_directory }}/temp_docker"
+
+- name: Clone a docker heimall
+  ansible.builtin.git:
+    repo: "https://github.com/linuxserver/docker-heimdall.git"
+    dest: "{{ heimdall_compose_directory }}/temp_docker"
+    force: yes
+
+- name: add custom script
+  ansible.builtin.copy:
+    src: "files/add_custom_item"
+    dest: "{{ heimdall_data_directory }}/temp_docker/custom/"
+
+# Change dockerfile to mount additional custom
+# /home/foo/appdata/my-custom-files:/custom-cont-init.d:ro
+# - name: overrite item.php file
+#   ansible.builtin.copy:
+#     src: "files/Item.php"
+#     dest: "{{ heimdall_compose_directory }}/temp_docker/root/app/www-tmp/app/"
+
+# set ARG HEIMDALL_RELEASE in Dockerfile
+- name: Build an image and push it to a private repo
+  community.docker.docker_image:
+    build:
+      path: "{{ heimdall_compose_directory }}/temp_docker/docker-heimdall"
+      args:
+        HEIMDALL_RELEASE: "v2.5.6"
+      nocache: true
+    name: heimdall_local
+    source: build
