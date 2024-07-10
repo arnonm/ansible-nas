@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     name: Lint Docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Lint docs
@@ -19,7 +19,7 @@ jobs:
 
   test-deploy:
     name: Test deployment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     defaults:
       run:
         working-directory: website
