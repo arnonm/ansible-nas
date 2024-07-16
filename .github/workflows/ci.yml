@@ -25,8 +25,12 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Install additional packages
+	run: |
+	  apt-get update && apt-get install -y  python-setuptools 
+
       - name: Install test dependencies
-        run: pip3 install ansible yamllint==1.27.1 ansible-lint==6.5 python-setuptools 
+        run: pip3 install ansible yamllint==1.27.1 ansible-lint==6.5
 
       - name: Ansible-lint
         run: ansible-lint nas.yml
