@@ -26,8 +26,7 @@ jobs:
           python-version: "3.x"
 
       - name: Install additional packages
-	run: |
-          apt-get update && apt-get install -y  python-setuptools  
+	      run: apt-get update && apt-get install -y  python-setuptools  
 
       - name: Install test dependencies
         run: pip3 install ansible yamllint==1.27.1 ansible-lint==6.5
