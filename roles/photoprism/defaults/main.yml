@@ -8,6 +8,7 @@ photoprism_storage: "{{ docker_home }}/prism/storage"
 photoprism_photos_directory: "{{ samba_shares_root }}/photos"
 photoprism_compose_directory: "{{ docker_home }}/prism"
 photoprism_originals: "{{ docker_home }}/prism/originals"
+photoprism_backup_directory: "{{ docker_home}}/prism/backup"
 photoprism_import: "{{ docker_home }}/prism/import"
 
 # uid / gid
@@ -29,6 +30,8 @@ photoprism_memory: "2g"
 #  - "/dev/dri:/dev/dri"
 photoprism_port: 2342
 photoprism_database_dir: "{{ mandatory }}"
+photoprism_database_config_dir: "{{ docker_home}}/prism/config"
+photoprism_database_init_dir: "{{ docker_home}}/prism/init"
 photoprism_database_name: "photoprism"
 photoprism_database_user: "photoprism"
 photoprism_password: "insecure"

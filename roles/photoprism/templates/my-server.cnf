@@ -1,0 +1,19 @@
+
+[mariadb]
+innodb_buffer_pool_size=1G
+innodb_rollback_on_timeout = OFF
+innodb_lock_wait_timeout = 120
+innodb_log_file_size = 128M
+
+transaction_isolation = READ-COMMITTED
+character_set_server = utf8mb4
+collation_server = utf8mb4_unicode_ci
+max_connections = 512
+performance_schema = ON
+
+join_buffer_size = 1200
+#thread_cache_size = 256
+tmp_table_size = 128M
+max_heap_table_size = 128M
+key_buffer = 256
+innodb_stats_on_metadata=OFF

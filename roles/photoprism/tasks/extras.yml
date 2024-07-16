@@ -1,0 +1,40 @@
+---
+- name: Template over config file
+  template:
+    src: templates/my-server.cnf
+    dest: "{{photoprism_database_config_dir}}/my-server.cnf"
+    owner: prism
+    group: prism
+
+- name: Template over init file
+  template:
+    src: templates/mysqltuner.sh
+    dest: "{{photoprism_database_config_dir}}/mysqltuner.sh"
+    owner: prism
+    group: prism
+
+
+- name: Template over prep file
+  template:
+    src: templates/prepmysqtuner.sh
+    dest: "{{photoprism_compose_directory}}/prepmysqtuner.sh"
+    owner: prism
+    group: prism
+
+
+- name: Template over backup file
+  template:
+    src: templates/backupdb.sh
+    dest: "{{photoprism_compose_directory}}/backupdb.sh"
+    owner: prism
+    group: prism
+
+- name: Add backup to crontab
+  ansible.builtin.cron:
+    name: Backup prism database 
+    minute: "50"
+    hour: "08" 
+    weekday: "6"
+    job: "{{photoprism_compose_directory}}/backupdb.sh"
+    user: root 
+    

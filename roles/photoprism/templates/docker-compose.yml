@@ -99,6 +99,7 @@ services:
       PHOTOPRISM_UID: "{{ photoprism_user_id | default(omit) }}"
       PHOTOPRISM_GID: "{{ photoprism_group_id | default(omit) }}"
       TZ: "{{ ansible_nas_timezone }}"
+      PHOTOPRISM_BACKUP_PATH: "/backup"
       # PHOTOPRISM_UMASK: 0000
     ## Start as a non-root user before initialization (supported IDs are 33, 50-99, 500-600, and 900-1200):
     # user: "1000:1000"
@@ -120,6 +121,7 @@ services:
       - "{{ photoprism_storage }}:/photoprism/storage" # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
       #- "{{photoprism_originals}}:/originals"
       - "{{photoprism_import}}:/import"
+      - "{{photoprism_backup_directory}}:/backup"
       - "{{traefik_data_directory}}:/data"
 
   ## Database Server (recommended)
@@ -137,6 +139,8 @@ services:
     ## Never store database files on an unreliable device such as a USB flash drive, an SD card, or a shared network folder:
     volumes:
       - "{{photoprism_database_dir}}:/var/lib/mysql" # DO NOT REMOVE
+      - "{{photoprism_database_config_dir}}:/etc/mysql/conf.d"
+      - "{{photoprism_database_init_dir}}:/docker-entrypoint-initdb.d"
     environment:
       MARIADB_AUTO_UPGRADE: "1"
       MARIADB_INITDB_SKIP_TZINFO: "1"

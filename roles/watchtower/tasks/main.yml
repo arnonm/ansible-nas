@@ -1,13 +1,25 @@
 ---
-- name: Watchtower Docker Container
-  docker_container:
-    name: watchtower
-    image: containrrr/watchtower
-    pull: true
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    env:
-      TZ: "{{ ansible_nas_timezone }}"
-    command: "{{ watchtower_command }}"
-    restart_policy: unless-stopped
-    memory: "{{ watchtower_memory }}"
+- name: Create  Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ watchtower_compose_directory }}"
+
+- name: copy Docker compose file
+  template:
+    src: "templates/docker-compose.yml"
+    dest: "{{ watchtower_compose_directory }}/docker-compose.yml"
+
+- name: Build 
+  docker_compose:
+    state: present
+    build: yes
+    project_src: "{{ watchtower_compose_directory }}"
+
+- name: Start 
+  docker_compose:
+    build: no
+    project_src: "{{ watchtower_compose_directory }}"
+
+

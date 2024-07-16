@@ -27,6 +27,9 @@
         with_items:
           - "{{ photoprism_config_directory }}"
           - "{{ photoprism_compose_directory }}"
+          - "{{ photoprism_backup_directory }}"
+          - "{{photoprism_database_init_dir}}"
+          - "{{photoprism_database_config_dir}}"
           - "{{ photoprism_storage }}"
           - "{{ photoprism_import }}"
           - "{{ photoprism_letsencrypt }}"
@@ -56,6 +59,10 @@
           state: present
           build: yes
           project_src: "{{ photoprism_compose_directory }}"
+
+      - name: Add extras 
+        include_tasks: roles/photoprism/tasks/extras.yml
+    
 
       - name: Start Photoprism
         docker_compose:

@@ -1,0 +1,25 @@
+version: "3"
+services:
+  "{{watchtower_service_name }}":
+    image: "{{watchtower_image_name}}"
+    name: "{{watchtower_container_name}}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: "{{ansible_nas_timezone}}"
+      # #WATCHTOWER_NOTIFICATIONS: "email"
+      # WATCHTOWER_NOTIFICATION_EMAIL_TO: "{{ansible_nas_email}}"
+      # WATCHTOWER_NOTIFICATION_EMAIL_FROM: "{{snapraid_runner_email_address}}"
+      # WATCHTOWER_NOTIFICATION_EMAIL_SERVER: "{{snapraid_runner_smtp_host}}"
+      # WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT: "{{snapraid_runner_smtp_port}}"
+      # WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER: "{{snapraid_runner_email_address}}"
+      # WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD: "{{snapraid_runner_email_pass}}"
+      # # WATCHTOWER_NOTIFICATION_EMAIL_DELAY: 5
+      #WATCHTOWER_POLL_INTERVAL: 604800
+      #WATCHTOWER_RUN_ONCE: true
+      #WATCHTOWER_MONITOR_ONLY: true
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_LIFECYCLE_HOOKS: True
+      WATCHTOWER_NOTIFICATIONS: shoutrrr
+      WATCHTOWER_NOTIFICATION_URL: "telegram://{{telegraph_bot_api}}@telegram/?channels={{telegraph_chanel_id}}"
+      WATCHTOWER_SCHEDULE: 0 0 20 * * 0
