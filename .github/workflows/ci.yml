@@ -26,7 +26,7 @@ jobs:
           python-version: "3.x"
 
       - name: Install additional packages
-	run: |
+	      run: |
           apt-get update && apt-get install -y  python-setuptools  
 
       - name: Install test dependencies
