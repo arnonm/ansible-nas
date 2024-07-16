@@ -11,7 +11,7 @@ on:
 jobs:
   generate-matrix:
     name: Generate test matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -24,7 +24,7 @@ jobs:
   test:
     name: "Test ${{ matrix.role }}"
     needs: generate-matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
         matrix:
             role: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
