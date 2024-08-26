@@ -5,25 +5,34 @@
     state: directory
   with_items:
     - "{{ traefik_data_directory }}"
-    - "{{ traefik_data_directory }}/letsencrypt"
+    - "{{ traefik_data_directory }}/data"
+    - "{{ traefik_data_directory }}/data/config"
 
-- name: Template Traefik config.toml
+- name: copy Traefik config file
   template:
-    src: traefik.toml
-    dest: "{{ traefik_data_directory }}/traefik.toml"
+    src: templates/traefik.yaml
+    dest: "{{ traefik_data_directory }}/data/traefik.yaml"
   register: template_config
 
-- name: Traefik Docker Container
-  docker_container:
-    name: traefik
-    image: "{{ traefik_docker_image }}"
-    pull: true
-    network_mode: host
-    volumes:
-      - "{{ traefik_data_directory }}/traefik.toml:/etc/traefik/traefik.toml:ro"
-      - "{{ traefik_data_directory }}/letsencrypt:/letsencrypt:rw"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    env: "{{ traefik_environment_variables }}"
-    restart_policy: unless-stopped
-    memory: "{{ traefik_memory }}"
-    recreate: "{{ template_config is changed }}"
+- name: copy ha config file
+  template:
+    src: templates/ha.yaml
+    dest: "{{ traefik_data_directory }}/data/config/ha.yaml"
+  register: template_config
+
+- name: Template over docker-compose.yml file
+  template:
+    src: templates/docker-compose.yml
+    dest: "{{traefik_data_directory}}/docker-compose.yml"
+
+- name: Build docker
+        docker_compose:
+          state: present
+          build: yes
+          project_src: "{{ traefik_data_directory }}"
+
+      - name: Start docker
+        docker_compose:
+          build: no
+          project_src: "{{ traefik_data_directory }}"
+  when: traefik_enabled is true

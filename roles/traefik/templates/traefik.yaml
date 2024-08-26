@@ -1,0 +1,55 @@
+---
+api:
+  insecure: true
+  dashboard: true
+  debug: true
+
+entryPoints:
+  web:
+    address: :{{traefik_port_http}}
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: :{{traefik_port_http}}
+    http:
+      tls:
+        certResolver: "letsencrypt"
+        domains:
+          - main: "ddns.net"
+            sans:
+              -  "*.ddns.net"
+          - main: "meshulam.uk"
+            sans:
+              - "*.meshulam.uk"
+
+providers:
+  providersThrottleDuration: "2s"
+  docker:
+    exposedbydefault: false
+    watch: true
+  file:
+    directory: "/config"
+    watch: true
+
+serversTransport:
+  insecureSkipVerify: true
+
+log:
+  level: "DEBUG"
+
+ping:
+  terminatingStatusCode: 0
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "{{ansible_nas_email}}"
+      storage: "/letsencrypt/acme.json"
+      caserver: "{{traefik_acme_server}}"
+      tlsChallenge: true
+      httpChallenge:
+        entryPoint: web

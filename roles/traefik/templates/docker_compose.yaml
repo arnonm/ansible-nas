@@ -1,0 +1,46 @@
+version: "3.3"
+services:
+  traefik:
+    image: "traefik:latest"
+    container_name: "traefik"
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    # environment:
+      # - CF_API_EMAIL=arnon.meshoulam@gmail.com
+      # - CF_DNS_API_TOKEN=YOUR_API_TOKEN
+      # - CF_API_KEY=god-cloudflare-api-key
+      # be sure to use the correct one depending on if you are using a token or key
+    command:
+      - "--log.level=TRACE"
+      - "--api.insecure=true"
+        #- "--accesslogs={}"
+      - "--providers.docker=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/opt/local/traefik/data/letsencrypt:/letsencrypt:rw"
+      - "/opt/local/traefik/data/traefik.yaml:/traefik.yaml:ro"
+      - "/opt/local/traefik/data/config:/config:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    extra_hosts:
+      - host.docker.internal:172.17.0.5
+
+
+  whoami:
+    image: "traefik/whoami"
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=false"
+      - "traefik.http.routers.whoami.rule=Host(`dsmhome.ddns.net`) && PathPrefix(`/whoami`)"
+      - "traefik.http.routers.whoami.entrypoints=web,websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+
+
+networks:
+  default:
+    external: true
+    name: proxy
