@@ -1,15 +1,15 @@
 ---
-name: Test Website Deployment
+name: Deploy to GitHub Pages
 
 on:
-  pull_request:
+  push:
     branches:
       - master
 
 jobs:
   lint:
     name: Lint Docs
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Lint docs
@@ -17,14 +17,15 @@ jobs:
         with:
           version: 0.32.2
 
-  test-deploy:
-    name: Test deployment
-    runs-on: ubuntu-22.04
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: website
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -36,3 +37,10 @@ jobs:
 
       - name: Build website
         run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Build output to publish to the `gh-pages` branch:
+          publish_dir: ./website/build
