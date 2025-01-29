@@ -1,0 +1,3 @@
+---
+{{ ansible_as_hostname }}
+socket: /var/run/docker.sock

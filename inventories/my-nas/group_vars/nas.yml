@@ -127,6 +127,79 @@ cockpit_port: 9090
 cockpit_packages: full
 cockpit_identities_enabled: true
 
+
+###
+### Homepage
+###
+homepage_available_externally: false
+homepage_enabled: true
+
+###
+###
+###
+internetpi_enabled: true
+tpi_config_dir: " {{ compose_home }}"
+# Domain names configuration (related services need to be enabled).
+pi_domain_name_enable: false
+pi_domain_name: 'home.local'
+pi_domain_pihole: 'pihole'          # to access pihole via: http://pihole.home.local
+domain_grafana: 'grafana'        # to access grafana via: http://grafana.home.local
+domain_prometheus: 'prometheus'  # to access prometheus via: http://prometheus.home.local
+
+
+# Pi-hole configuration.
+pihole_enable: true 
+pihole_hostname: pihole
+pihole_timezone: Asia/Jerusalem
+pihole_password: "Mashov123"
+pihole_port: 80
+
+# Run pihole in a virtual vlan
+pihole_vlan: true
+pihole_vlan_ipaddr: 192.168.1.10
+pihole_vlan_link: enp0s31f6
+pihole_vlan_subnet: 192.168.1.0/24
+pihole_vlan_range: 192.168.1.0/28
+pihole_vlan_gateway: 192.168.1.1
+
+# Internet monitoring configuration.
+monitoring_enable: true
+monitoring_grafana_admin_password: "Mashov123"
+monitoring_speedtest_interval: 60m
+monitoring_ping_interval: 5s
+monitoring_ping_hosts:  # [URL];[HUMAN_READABLE_NAME]
+  - http://www.google.com/;google.com
+  - https://github.com/;github.com
+  - https://www.apple.com/;apple.com
+
+# Prometheus configuration.
+prometheus_monitor_prometheus: false
+prometheus_node_exporter_targets:
+  - 'nodeexp:9100'
+prometheus_extra_scrape_configs: ''
+prometheus_tsdb_retention_time: 90d
+prometheus_port: 9092
+
+# Shelly Plug configuration. (Also requires `monitoring_enable`)
+shelly_plug_enable: false
+shelly_plug_hostname: my-shelly-plug-host-or-ip
+shelly_plug_http_username: username
+shelly_plug_http_password: "password"
+
+# AirGradient configuration. (Also requires `monitoring_enable`)
+airgradient_enable: false
+airgradient_sensors:
+  # ID Should be limited to no more than 38 characters, in the set a-z.
+  - id: livingroom
+    ip: "192.168.0.123"
+    port: 9925
+
+# Starlink configuration. (Also requires `monitoring_enable`)
+starlink_enable: false
+
+# Add homepage labels
+homepage: true
+
 ###
 ###
 ###
