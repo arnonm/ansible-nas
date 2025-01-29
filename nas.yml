@@ -247,10 +247,18 @@
         - homeassistant
       when: (homeassistant_enabled | default(False))
 
+    - role: homepage
+      tags:
+        - homepage
+      when: (homepage_enabled | default(False))
+
     - role: homebridge
       tags:
         - homebridge
       when: (homebridge_enabled | default(False))
+
+    - role: internet-pi
+      when: (inernetpi_enabled | default(False))
 
     - role: jackett
       tags:
